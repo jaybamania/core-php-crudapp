@@ -1,0 +1,124 @@
+* {
+  margin: 0px;
+}
+.mainbody {
+  background-color: lightgrey;
+  padding: 10px 10px 100px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+}
+.performSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid black;
+  margin-bottom: 30px;
+}
+.usertable {
+  text-align: left;
+  overflow: hidden;
+  width: 80%;
+  margin: 0 auto;
+  display: table;
+  padding: 0 0 8em 0;
+}
+.adminSearch {
+  display: flex;
+  margin-left: 10px;
+  height: 30px;
+}
+.adminSearch > button {
+  border: none;
+  background-color: grey;
+  border-bottom-right-radius: 5px;
+  border-top-right-radius: 5px;
+  opacity: 0.7;
+}
+.adminSearch > button:hover {
+  opacity: 1;
+}
+.adminSearch > input {
+  border: none;
+  border-bottom-left-radius: 5px;
+  border-top-left-radius: 5px;
+}
+.addButton {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.addButton button {
+  border-radius: 5px;
+  height: 30px;
+  background-color: yellow;
+  opacity: 0.8;
+  color: grey;
+  border: 1px solid grey;
+}
+.addButton button:hover {
+  opacity: 1;
+  border: 1px solid black;
+  color: black;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 1.5vw;
+  box-shadow: 3px 4px 3px 2px rgb(0, 0, 0, 0.3);
+}
+a {
+  text-decoration: none;
+}
+th,
+td {
+  padding-bottom: 2%;
+  padding-top: 2%;
+  padding-left: 2%;
+}
+tr:hover {
+  background-color: #f5f5f5;
+}
+tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+.editButton {
+  background-color: orange;
+  text-decoration: none;
+  border: none;
+  color: black;
+  opacity: 0.8;
+  border-radius: 4px;
+  margin: 2px;
+  font-size: 1.5vw;
+  padding: 5px;
+}
+.deleteButton {
+  background-color: red;
+  text-decoration: none;
+  border: none;
+  color: black;
+  opacity: 0.8;
+  border-radius: 4px;
+  margin: 2px;
+  font-size: 1.5vw;
+  padding: 5px;
+}
+.editButton:hover,
+.deleteButton:hover {
+  opacity: 1;
+}
+.operations {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.successfulMsg {
+  color: green;
+  margin-bottom: 5px;
+}
