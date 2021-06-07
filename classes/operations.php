@@ -48,25 +48,51 @@ class CheckEmail {
         public $email = "";
         public $phone = "";
         public $address = "";
+
+        public $nameErr = "";
+        public $emailErr = "";
+        public $phoneErr = "";
+        public $addressErr = "";
+
+    public function test_input($data) {
+        $data = trim($data);
+        $data = stripslashes($data);
+        $data = htmlspecialchars($data);
+        return $data;
+      }
     
-      public function validate($conn) {
-        if (empty($_POST["name"])) {
-            $nameErr = "Name is required";
+      public function validate_name() {
+        if (empty($this->name)) {
+            $this->nameErr = "Name is required";
+            return $this->nameErr;
+          } 
+      }
+      public function validate_email(){
+          if (empty($this->email)) {
+            $this->emailErr = "Email is required";
+            return $this->emailErr;
           } else {
-            $name = test_input($_POST["name"]);
-            // check if name only contains letters and whitespace
-            if (!preg_match("/^[a-zA-Z-' ]*$/",$name)) {
-              $nameErr = "Only letters and white space allowed";
+            $this->email = $this->test_input($_POST["email"]);
+            // check if e-mail address is well-formed
+            if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+                $this->emailErr = "Invalid email format";
+                return $this->emailErr;
             }
           }
-        // echo "<p>Table '{$this->title}' has {$this->numRows} rows.</p>";
-        $insert="insert into members(`name`, `phone`, `email`, `address`) values('{$this->name}','{$this->phone}','{$this->email}','{$this->address}');";
-        $runn=mysqli_query($conn, $insert);
-        if($runn){
-            return 1;
-        }else{
-            return 0;
+        }  
+        public function validate_address(){
+          if (empty($this->address)) {
+            $this->addressErr = "Address is required";
+            return $this->addressErr;
+          } 
         }
+
+        public function validate_phone(){
+          if (empty($this->phone)) {
+            $this->phoneErr = "Phone No is Required";
+            return $this->phoneErr;
+          } 
+        // echo "<p>Table '{$this->title}' has {$this->numRows} rows.</p>";
       }
     }
 

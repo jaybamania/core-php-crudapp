@@ -6,39 +6,59 @@ include "classes/operations.php";
 use Ops as O;
 require("include/connect.php");
 if(isset($_POST['adddata'])) {
-    $user = new O\Add();
-    // $table->title = "My table";
-    // $table->numRows = 5;
-    $user->name = $_POST['name'];
-    $user->email = $_POST['email'];
-    $user->phone = $_POST['phone'];
-    $user->address = $_POST['address'];
-	  
-    $check_email = new O\CheckEmail();
-    $check_email->email = $_POST['email'];
-	$duplicate=$check_email->checkEmail($conn);
+    $validation = new O\Validations();
+    $validation->name = $_POST['name'];
+    $validation->email = $_POST['email'];
+    $validation->phone = $_POST['phone'];
+    $validation->address = $_POST['address'];
+
+    $nameErr = $validation->validate_name();
+    $emailErr = $validation->validate_email();
+    $phoneErr = $validation->validate_phone();
+    $addressErr = $validation->validate_address();
+
+    if(!$nameErr && !$emailErr && !$phoneErr && !$addressErr){
+        $user = new O\Add();
+        // $table->title = "My table";
+        // $table->numRows = 5;
+        $user->name = $_POST['name'];
+        $user->email = $_POST['email'];
+        $user->phone = $_POST['phone'];
+        $user->address = $_POST['address'];
+        
+        $check_email = new O\CheckEmail();
+        $check_email->email = $_POST['email'];
+        $duplicate=$check_email->checkEmail($conn);
+        
+        // if (mysqli_num_rows($duplicate)>0)
+        // {
+        //     $emailError = "<p style='color:red;'> This email is already registered</p>";
+
+        // }	
+        if(!$duplicate){
+            $emailError = "<p style='color:red;'> This email is already registered</p>";
+            echo $emailError;
+        }   
+        else{
+            $runn= $user->insert($conn);
+            if($runn){
+                $created= "<h4 style='color:green;'>Account Created Successfully</h4>";
+                echo $created;
+
+            }else{
+                // echo "Error: " . $insert . "    " . mysqli_error($conn);
+                echo "Error:".mysqli_error($conn);
+            }
+
+        }   
+    }
+    else{
+        echo $nameErr;
+        echo $emailErr;
+        echo $phoneErr;
+        echo $addressErr;
+    }
     
-	// if (mysqli_num_rows($duplicate)>0)
-	// {
-	//     $emailError = "<p style='color:red;'> This email is already registered</p>";
-
-	// }	
-    if(!$duplicate){
-        $emailError = "<p style='color:red;'> This email is already registered</p>";
-        echo $emailError;
-    }   
-	else{
-        $runn= $user->insert($conn);
-        if($runn){
-            $created= "<h4 style='color:green;'>Account Created Successfully</h4>";
-            echo $created;
-
-        }else{
-            // echo "Error: " . $insert . "    " . mysqli_error($conn);
-            echo "Error:".mysqli_error($conn);
-        }
-
-    }   
 
 }
 
