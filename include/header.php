@@ -7,7 +7,6 @@
 	<link rel="stylesheet" type="text/css" href="css/header.css">
 	<link rel="stylesheet" type="text/css" href="css/index.css">
     <link rel="stylesheet" type="text/css" href="css/add.css">
-	<!-- <link rel="stylesheet" type="text/css" href="css/edit.css"> -->
 </head>
 <body>
 <div class="heading">

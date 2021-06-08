@@ -12,7 +12,6 @@ if(isset($_POST['search_data'])){
     $search_data->string = $_POST['search'];
     $search_result = $search_data->search($conn);
     
-    // header('Location: index.php');
 }
 
 ?>
@@ -29,29 +28,26 @@ if(isset($_POST['search_data'])){
             </tr>
             
             <?php $i=1; 
-                // while ($row = $users->fetch_assoc()) {
-                    if(isset($search_result)){
-                        foreach($search_result as $row) :
-                            ?>
-                            <tr>
-                                <td><?php echo $i++;  ?></td>
-                                <td><?php echo $row['name'];  ?></td>
-                                <td><?php echo $row['email'];  ?></td>
-                                <td><?php echo $row['phone'];  ?></td>
-                                <td><?php echo $row['address'];  ?></td>
-                                <td class="operations">
-                                    <a class="deleteButton" href="delete.php?id=<?php echo $row['id']; ?>&&i=<?php echo $i-1; ?>">Delete</a>
-                                    <a class="editButton" href="edit.php?id=<?php echo $row['id']; ?>&&i=<?php echo $i-1; ?>">Edit</a>
-                                </td>
-                            </tr>
-                            <?php
-                       // }
-                            endforeach;
-                    }else{
-                        echo "<tr><td colspan='6'>No results Found</td></tr>";
-                    }
+                if(isset($search_result)){
+                    foreach($search_result as $row) :
+                        ?>
+                        <tr>
+                            <td><?php echo $i++;  ?></td>
+                            <td><?php echo $row['name'];  ?></td>
+                            <td><?php echo $row['email'];  ?></td>
+                            <td><?php echo $row['phone'];  ?></td>
+                            <td><?php echo $row['address'];  ?></td>
+                            <td class="operations">
+                                <a class="deleteButton" href="delete.php?id=<?php echo $row['id']; ?>&&i=<?php echo $i-1; ?>">Delete</a>
+                                <a class="editButton" href="edit.php?id=<?php echo $row['id']; ?>&&i=<?php echo $i-1; ?>">Edit</a>
+                            </td>
+                        </tr>
+                        <?php
+                        endforeach;
+                }else{
+                    echo "<tr><td colspan='6'>No results Found</td></tr>";
+                }
             ?>
-
         </table>
     </div>
 </div>
