@@ -1,14 +1,19 @@
 <?php
+$my_header = 'Admin Panel';
 include("include/header.php");
 ?>
 <?php
 require("include/connect.php");
-$users = mysqli_query($conn,'select * from members ');
-$fetch_users = mysqli_fetch_all($users, MYSQLI_ASSOC);
+include "classes/operations.php";
+use Ops as O;
+$userData = new O\GetData();
+$getData = $userData->getAllData($conn);
 
 // while ($row = $users->fetch_assoc()) {
 //     echo $row['name']."<br>";
 // }
+
+
 ?>
 <div class="mainbody">
     <div class="performSection">
@@ -21,22 +26,13 @@ $fetch_users = mysqli_fetch_all($users, MYSQLI_ASSOC);
         <!-- <span style="color:red">@error('search'){{$message}}@enderror</span> -->
     </form>
     </div>
-   
-    <div>
-        <!-- @if(session('name'))
-          <h3 class="successfulMsg">Member {{session('name')}}  has been added</h3>
-        @endif
 
-        @if(session('updated_name') && session('id'))
-          <h3 class="successfulMsg">Member : {{session('id')}} {{session('updated_name')}}  has been Updated</h3>
-        @endif
-
-        @if(session('delete_id'))
-          <h3 class="successfulMsg">Member {{session('delete_id')}}  has been Deleted Successfully</h3>
-        @endif -->
-
-    </div>
-
+    <h4 style="color:green; font-size:2vw;"><?php
+    session_start();
+    if(isset($_SESSION['success'])){   
+        echo $_SESSION['success'];
+        unset($_SESSION['success']);}
+?></h4>
     <div class="usertable">
         <table  style="background-color:white">
             <tr>
@@ -50,7 +46,7 @@ $fetch_users = mysqli_fetch_all($users, MYSQLI_ASSOC);
             
             <?php $i=1; 
                 // while ($row = $users->fetch_assoc()) {
-                    foreach($fetch_users as $row) :
+                    foreach($getData as $row) :
                     ?>
                     <tr>
                         <td><?php echo $i++;  ?></td>
@@ -59,8 +55,8 @@ $fetch_users = mysqli_fetch_all($users, MYSQLI_ASSOC);
                         <td><?php echo $row['phone'];  ?></td>
                         <td><?php echo $row['address'];  ?></td>
                         <td class="operations">
-                            <a class="deleteButton" href="delete/<?php echo $row['id']; ?>">Delete</a>
-                            <a class="editButton" href="edit/<?php echo $row['id']; ?>">Edit</a>
+                            <a class="deleteButton" href="delete.php?id=<?php echo $row['id']; ?>&&i=<?php echo $i-1; ?>">Delete</a>
+                            <a class="editButton" href="edit.php?id=<?php echo $row['id']; ?>&&i=<?php echo $i-1; ?>">Edit</a>
                         </td>
                     </tr>
                     <?php

@@ -7,10 +7,11 @@
 	<link rel="stylesheet" type="text/css" href="css/header.css">
 	<link rel="stylesheet" type="text/css" href="css/index.css">
     <link rel="stylesheet" type="text/css" href="css/add.css">
+	<!-- <link rel="stylesheet" type="text/css" href="css/edit.css"> -->
 </head>
 <body>
 <div class="heading">
-    <h1>Admin Panel</h1>
+    <h1><?php echo $my_header; ?> </h1>
 </div>
 
 	

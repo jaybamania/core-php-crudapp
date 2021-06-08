@@ -44,3 +44,7 @@
 .singleform > label {
   width: 70px;
 }
+.inputAndError{
+  display: flex;
+  flex-direction: column;
+}

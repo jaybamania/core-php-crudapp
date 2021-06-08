@@ -1,4 +1,5 @@
 <?php
+$my_header = 'Add Form';
 include("include/header.php");
 ?>
 <?php
@@ -11,6 +12,11 @@ if(isset($_POST['adddata'])) {
     $validation->email = $_POST['email'];
     $validation->phone = $_POST['phone'];
     $validation->address = $_POST['address'];
+
+    //Variables for Error Messages
+    $duplicate = $nameErr = $emailErr = $phoneErr = $addressErr = "";
+    //Variable for Successful Message
+    $created = "";
 
     $nameErr = $validation->validate_name();
     $emailErr = $validation->validate_email();
@@ -29,28 +35,18 @@ if(isset($_POST['adddata'])) {
         $check_email = new O\CheckEmail();
         $check_email->email = $_POST['email'];
         $duplicate=$check_email->checkEmail($conn);
-        
-        // if (mysqli_num_rows($duplicate)>0)
-        // {
-        //     $emailError = "<p style='color:red;'> This email is already registered</p>";
-
-        // }	
+	
         if(!$duplicate){
-            $emailError = "<p style='color:red;'> This email is already registered</p>";
-            echo $emailError;
-        }   
-        else{
-            $runn= $user->insert($conn);
-            if($runn){
-                $created= "<h4 style='color:green;'>Account Created Successfully</h4>";
-                echo $created;
-
-            }else{
-                // echo "Error: " . $insert . "    " . mysqli_error($conn);
+            $created= $user->insert($conn);
+            if(!$created){
                 echo "Error:".mysqli_error($conn);
             }
-
-        }   
+            else{
+                session_start();
+                $_SESSION['success'] = $created;
+                header('Location: index.php');
+            }
+        }  
     }
     else{
         echo $nameErr;
@@ -66,29 +62,33 @@ if(isset($_POST['adddata'])) {
 <body>
 <div class="mainbody">
 
-
+<h4 style="color:red; font-size:2vw;"><?php if(isset($duplicate)){ echo $duplicate;}  ?></h4>
+<h4 style="color:green; font-size:2vw;"><?php if(isset($created)){ echo $created;}  ?></h4>
 <form class="addForm" method="POST">
     <div class="singleform">
         <label>Name : </label>
+        
         <input type="text" name="name" id="name">
-        <!-- <span style="color:red">@error('name'){{$message}}@enderror</span> -->
+        <br />
+        <span style="color:red"><?php if(isset($nameErr)){echo $nameErr;} ?></span> 
+       
     </div>
     <div  class="singleform">
         <label>Email : </label>
         <input type="email" name="email"  id="email">
-        <!-- <span style="color:red">@error('email'){{$message}}@enderror</span> -->
+        <span style="color:red"><?php if(isset($emailErr)){echo $emailErr;} ?></span> 
     </div>
     <div  class="singleform">
         <label>Phone : </label>
         <input type="text" name="phone"  id="phone">
-        <!-- <span style="color:red">@error('phone'){{$message}}@enderror</span> -->
+        <span style="color:red"><?php if(isset($phoneErr)){echo $phoneErr;} ?></span> 
     </div>
     <div  class="singleform">
         <label>Address : </label>
         <textarea  name="address" id="address">
         
         </textarea>
-        <!-- <span style="color:red">@error('address'){{$message}}@enderror</span> -->
+        <span style="color:red"><?php if(isset($addressErr)){echo $addressErr;} ?></span> 
     </div>
     <button type="submit" name="adddata">Submit</button>
 </form>
