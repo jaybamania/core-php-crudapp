@@ -37,7 +37,6 @@ if (isset($_POST['updatedata'])) {
         $check_email->email = $_POST['email'];
         $email_while_update = $check_email->checkEmailWhileUpdate($conn);
         if($email_while_update){
-            $email_updated = "Email Updated Successfull";
             
             $updated = $updated_user->update($conn);
             if (!$updated) {
@@ -59,9 +58,7 @@ if (isset($_POST['updatedata'])) {
 <h4 style="color:red; font-size:2vw;"><?php if (isset($duplicate)) {
     echo $duplicate;
 } ?></h4>
-<h4 style="color:green; font-size:2vw;"><?php if (isset($email_updated)) {
-    echo $email_updated;
-} ?></h4>
+
 <form class="addForm" method="post">
 <input type="hidden" name="id" id="id" value="<?php echo $getData['id']; ?>" >
     <div class="singleform">
