@@ -20,9 +20,9 @@ $getData = $userData->getAllData($conn);
     <div class="addButton">
         <button ><a href="add.php">+ Add Member</a></button>
     </div>
-    <form class="adminSearch" action="/admin" method="post">
+    <form class="adminSearch" action="search.php" method="post">
         <input type="text" name="search" id="search" placeholder="Search by Names">
-        <button type="submit">Search</button>
+        <button type="submit" name="search_data">Search</button>
         <!-- <span style="color:red">@error('search'){{$message}}@enderror</span> -->
     </form>
     </div>

@@ -158,8 +158,35 @@ class CheckEmail {
       }
     }
 
+class SearchData {
+  public $string = "";
+
+  public function search($conn) {
+    $search_query = mysqli_query($conn,"select * from members where name like '%$this->string%'");
+    // while($row= mysqli_fetch_array($search_query)){
+    //   return $row;
+    // }
+    // if (mysqli_num_rows($search_query)>0)
+    //   {   
+        // $search_users = mysqli_fetch_all($search_query, MYSQLI_ASSOC);
+        // return $search_users;
+    //   }
+    // if (mysqli_num_rows($search_query)>0)
+    //  {   
+    //    $fetch_users = mysqli_fetch_array($search_query, MYSQLI_ASSOC);
+    //    return $fetch_users;
+    //  }
+    if (mysqli_num_rows($search_query)>0)
+    {   
+      $fetch_users = mysqli_fetch_all($search_query, MYSQLI_ASSOC);
+      return $fetch_users;
+    }
+  }
+}
+
 class Row {
   public $numCells = 0;
+  
   public function message() {
     echo "<p>The row has {$this->numCells} cells.</p>";
   }
