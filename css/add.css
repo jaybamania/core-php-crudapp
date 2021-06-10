@@ -29,7 +29,7 @@
   margin-bottom: 10px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
 }
 .singleform > input {
   margin: 5px;
@@ -43,8 +43,15 @@
 }
 .singleform > label {
   width: 70px;
+  float: left;
 }
-.inputAndError{
+.inputAndError {
   display: flex;
   flex-direction: column;
+}
+.checkboxClass {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }

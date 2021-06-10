@@ -22,6 +22,60 @@ class GetData
             return $fetch_users;
         }
     }
+    public function getEducationData($conn)
+    {
+        $educationData = mysqli_query($conn, "select * from member_education ");
+        if (mysqli_num_rows($educationData) > 0) {
+            $fetch_educations = mysqli_fetch_all($educationData, MYSQLI_ASSOC);
+            return $fetch_educations;
+        }
+    }
+    public function getHobbiesData($conn)
+    {
+        $hobbiesData = mysqli_query($conn, "select * from member_hobbies ");
+        if (mysqli_num_rows($hobbiesData) > 0) {
+            $fetch_hobbies = mysqli_fetch_all($hobbiesData, MYSQLI_ASSOC);
+            return $fetch_hobbies;
+        }
+    }
+
+    public function getEducationNamebyId($conn,$str)
+    {
+        
+        // preg_match_all('!\d+!', $str, $matches);
+        // print_r($matches);
+        // $int = (int) filter_var($str, FILTER_SANITIZE_NUMBER_INT);  
+        // echo("The extracted numbers are: $int \n");
+        $numbers = preg_replace('/[^0-9]/', '', $str);
+        $return_str="";
+        // $educationData = mysqli_query($conn, "select education_name from member_education where education_id = '$numbers[0]' ");
+        // if (mysqli_num_rows($educationData) > 0) {
+        //     $fetch_hobbies = mysqli_fetch_array($educationData, MYSQLI_ASSOC);
+        //     return $fetch_hobbies['education_name'];
+        // }
+        for($i = 0; $i<strlen($numbers);$i++){
+            $getNames = mysqli_query($conn, "select education_name from member_education where education_id = '$numbers[$i]' ");
+            if (mysqli_num_rows($getNames) > 0) {
+                $fetch_names = mysqli_fetch_array($getNames, MYSQLI_ASSOC);
+                $return_str = $return_str.$fetch_names['education_name']."  ";
+            }
+        }
+        return $return_str;
+    }
+    public function getHobbiesNamebyId($conn,$str)
+    {
+        $numbers = preg_replace('/[^0-9]/', '', $str);
+        $return_str="";
+        for($i = 0; $i<strlen($numbers);$i++){
+            $getNames = mysqli_query($conn, "select hobby_name from member_hobbies where hobby_id = '$numbers[$i]' ");
+            if (mysqli_num_rows($getNames) > 0) {
+                $fetch_names = mysqli_fetch_array($getNames, MYSQLI_ASSOC);
+                $return_str = $return_str.$fetch_names['hobby_name']."  ";
+                
+            }
+        }
+        return $return_str;
+    }
 }
 
 class Add
@@ -30,11 +84,13 @@ class Add
     public $email = "";
     public $phone = "";
     public $address = "";
+    public $education = "";
+    public $hobbies = "";
     public $created = "";
 
     public function insert($conn)
     {
-        $insert = "insert into members(`name`, `phone`, `email`, `address`) values('{$this->name}','{$this->phone}','{$this->email}','{$this->address}');";
+        $insert = "insert into members(`name`, `phone`, `email`, `address`,`education_id`,`hobbies_id`) values('{$this->name}','{$this->phone}','{$this->email}','{$this->address}','{$this->education}','{$this->hobbies}');";
         $runn = mysqli_query($conn, $insert);
         if ($runn) {
             $this->created = "Member {$this->name} has been Created Successfully";
@@ -88,11 +144,15 @@ class Validations
     public $email = "";
     public $phone = "";
     public $address = "";
+    public $education = "";
+    public $hobbies = "";
 
     public $nameErr = "";
     public $emailErr = "";
     public $phoneErr = "";
     public $addressErr = "";
+    public $educationErr = "";
+    public $hobbiesErr = "";
 
     public function test_input($data)
     {
@@ -126,7 +186,6 @@ class Validations
     public function validate_phone()
     {
         if (empty($this->phone)) {
-            echo "Hello" . $this->phone;
             $this->phoneErr = "<p style='color:red;'> Phone No. is Required</p>";
             return $this->phoneErr;
         }
@@ -138,6 +197,24 @@ class Validations
             $this->addressErr = "<p style='color:red;'> Address is Required</p>";
             echo $this->addressErr;
             return $this->addressErr;
+        }
+    }
+
+    public function validate_education()
+    {
+        if (empty($this->education)) {
+            // echo "Hello" . $this->education;
+            $this->educationErr = "<p style='color:red;'> Alteast you must Qualify SSC </p>";
+            return $this->educationErr;
+        }
+    }
+
+    public function validate_hobbies()
+    {
+        if (empty($this->hobbies)) {
+            // echo "Hello" . $this->hobbies;
+            $this->hobbiesErr = "<p style='color:red;'> Enter atleast one Hobby</p>";
+            return $this->hobbiesErr;
         }
     }
 }
