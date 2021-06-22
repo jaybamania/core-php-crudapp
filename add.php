@@ -5,25 +5,55 @@ include "include/header.php";
 <?php
 include "classes/operations.php";
 use Ops as O;
-
+$user = new O\Add();
 require "include/connect.php";
 if (isset($_POST['adddata'])) {
-    $user = new O\Add();
+    
     $user->name = $_POST['name'];
     $user->email = $_POST['email'];
     $user->phone = $_POST['phone'];
     $user->address = $_POST['address'];
-    if(isset($_POST['hobbies'])){$user->hobbies = implode(',', $_POST['hobbies']); }
     if(isset($_POST['education'])){$user->education = implode(',', $_POST['education']); }
+    if(isset($_POST['hobbies'])){$user->hobbies = implode(',', $_POST['hobbies']); }
+    //Inserting Image
+    // $check = getimagesize($_FILES["image"]["tmp_name"]);
+    // if($check !== false){
+    //     $image = $_FILES['image']['tmp_name'];
+    //     $imgContent = addslashes(file_get_contents($image));
+    //     $user = new O\Add();
+    //     $user->image = $imgContent;
+        
+    // }
+    $output_dir = "upload/";/* Path for file upload */
+	$RandomNum   = time();
+	$ImageName      = str_replace(' ','-',strtolower($_FILES['image']['name'][0]));
+	$ImageType      = $_FILES['image']['type'][0];
+ 
+	$ImageExt = substr($ImageName, strrpos($ImageName, '.'));
+	$ImageExt       = str_replace('.','',$ImageExt);
+	$ImageName      = preg_replace("/\.[^.\s]{3,4}$/", "", $ImageName);
+	$NewImageName = $ImageName.'-'.$RandomNum.'.'.$ImageExt;
+    $ret[$NewImageName]= $output_dir.$NewImageName;
+	
+	/* Try to create the directory if it does not exist */
+	if (!file_exists($output_dir))
+	{
+		@mkdir($output_dir, 0777);
+	}               
+	move_uploaded_file($_FILES["image"]["tmp_name"][0],$output_dir."/".$NewImageName );
+    // $imageVar = new O\UploadImage();
+    // $imageUpload = $imageVar->uploadimage($ImageName,$ImageType,$output_dir);
+    $user->image = $NewImageName; 
     $validation = new O\Validations();
     $validation->name = $_POST['name'];
     $validation->email = $_POST['email'];
     $validation->phone = $_POST['phone'];
     $validation->address = $_POST['address'];
-    if(isset($_POST['hobbies'])){$validation->hobbies = implode(',', $_POST['hobbies']);}
+    $validation->image = $ImageName ;
     if(isset($_POST['education'])){$validation->education = implode(',', $_POST['education']); }
+    if(isset($_POST['hobbies'])){$validation->hobbies = implode(',', $_POST['hobbies']);}
     //Variables for Error Messages
-    $duplicate = $nameErr = $emailErr = $phoneErr = $addressErr = $hobbiesErr = $educationErr = ""; 
+    $duplicate = $nameErr = $emailErr = $phoneErr = $addressErr = $hobbiesErr = $educationErr = $imageErr = ""; 
     //Variable for Successful Message
     $created = "";
     //validations of every fields
@@ -31,9 +61,10 @@ if (isset($_POST['adddata'])) {
     $emailErr = $validation->validate_email();
     $phoneErr = $validation->validate_phone();
     $addressErr = $validation->validate_address();
-    $hobbiesErr = $validation->validate_hobbies();
     $educationErr = $validation->validate_education();
-    if (!$nameErr && !$emailErr && !$phoneErr && !$addressErr && !$hobbiesErr && !$educationErr) {
+    $hobbiesErr = $validation->validate_hobbies();
+    $imageErr = $validation->validate_image();
+    if (!$nameErr && !$emailErr && !$phoneErr && !$addressErr && !$hobbiesErr && !$educationErr && !$imageErr) {
         //Check Email if already exists
         $check_email = new O\CheckEmail();
         $check_email->email = $_POST['email'];
@@ -51,12 +82,14 @@ if (isset($_POST['adddata'])) {
         }
     }
 }else{
-    $user = new O\Add();
+
     $user->name = "";
     $user->email = "";
     $user->phone = "";
     $user->address = "";
+    $user->education = "";
     $user->hobbies="";
+    $user->image="";
 }
 ?>
 <body>
@@ -65,7 +98,7 @@ if (isset($_POST['adddata'])) {
 <h4 style="color:red; font-size:2vw;"><?php if (isset($duplicate)) {
     echo $duplicate;
 } ?></h4>
-<form class="addForm" method="POST">
+<form class="addForm" method="POST" enctype="multipart/form-data">
 <div class="singleform">
         <label>Name : </label>
         
@@ -73,6 +106,16 @@ if (isset($_POST['adddata'])) {
         <br />
         <span style="color:red"><?php if (isset($nameErr)) {
             echo $nameErr;
+        } ?></span> 
+       
+    </div>
+    <div class="singleform">
+        <label>Image Profile : </label>
+        
+        <input type="file" name="image[]" value="<?php echo $user->image; ?>"/>
+        <br />
+        <span style="color:red"><?php if (isset($imageErr)) {
+            echo $imageErr;
         } ?></span> 
        
     </div>
@@ -110,7 +153,7 @@ if (isset($_POST['adddata'])) {
             <select name="education[]" id="education" multiple>
             <?php
                 foreach ($educationData as $row): ?>
-                <option value="<?php echo $row['education_id'] ?>"><?php echo $row['education_name']?></option>
+                <option  value="<?php echo $row['education_id'] ?>"><?php echo $row['education_name']?></option>
                 <?php endforeach;
             ?>
             </select>
@@ -123,9 +166,13 @@ if (isset($_POST['adddata'])) {
          <label>Hobbies : </label>
             <div class="checkboxClass">
             <?php
-                foreach ($hobbiesData as $row): ?>
-                <input type="checkbox" name="hobbies[]" value="<?php echo $row['hobby_id'] ?>"><?php echo $row['hobby_name'] ?><br/>
-                <?php endforeach;
+                foreach ($hobbiesData as $row): 
+                if($user->hobbies == ""){?>
+                    <input type="checkbox" name="hobbies[]"  value="<?php echo $row['hobby_id'] ?>"><?php echo $row['hobby_name'] ?><br/>
+                <?php }else{ ?>
+                     <input type="checkbox" checked name="hobbies[]"  value="<?php echo $row['hobby_id'] ?>"><?php echo $row['hobby_name'] ?><br/>
+                     <?php  
+                }endforeach;
             ?>
             </div>
             <span style="color:red"><?php if (isset($hobbiesErr)) {

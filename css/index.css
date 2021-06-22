@@ -17,14 +17,7 @@
   border-bottom: 1px solid black;
   margin-bottom: 30px;
 }
-.usertable {
-  text-align: left;
-  overflow: hidden;
-  width: 80%;
-  margin: 0 auto;
-  display: table;
-  padding: 0 0 8em 0;
-}
+
 .adminSearch {
   display: flex;
   margin-left: 10px;
@@ -74,6 +67,11 @@
 a {
   text-decoration: none;
 }
+.indertr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 .indexth,
 .indextd {
   padding-bottom: 2%;
@@ -121,4 +119,10 @@ a {
 .successfulMsg {
   color: green;
   margin-bottom: 5px;
+}
+.profileImg {
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+  border: none;
 }

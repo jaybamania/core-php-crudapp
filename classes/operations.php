@@ -14,9 +14,17 @@ class GetData
             return $fetch_users;
         }
     }
-    public function getAllData($conn)
+    public function getAllData($conn,$offset,$noOfRecordsPerPage)
     {
-        $userData = mysqli_query($conn, "select * from members ");
+        $userData = mysqli_query($conn, "select * from members LIMIT $offset, $noOfRecordsPerPage");
+        if (mysqli_num_rows($userData) > 0) {
+            $fetch_users = mysqli_fetch_all($userData, MYSQLI_ASSOC);
+            return $fetch_users;
+        }
+    }
+    public function getAllMembers($conn)
+    {
+        $userData = mysqli_query($conn, "select * from members");
         if (mysqli_num_rows($userData) > 0) {
             $fetch_users = mysqli_fetch_all($userData, MYSQLI_ASSOC);
             return $fetch_users;
@@ -24,7 +32,7 @@ class GetData
     }
     public function getEducationData($conn)
     {
-        $educationData = mysqli_query($conn, "select * from member_education ");
+        $educationData = mysqli_query($conn, "select * from education ");
         if (mysqli_num_rows($educationData) > 0) {
             $fetch_educations = mysqli_fetch_all($educationData, MYSQLI_ASSOC);
             return $fetch_educations;
@@ -32,7 +40,7 @@ class GetData
     }
     public function getHobbiesData($conn)
     {
-        $hobbiesData = mysqli_query($conn, "select * from member_hobbies ");
+        $hobbiesData = mysqli_query($conn, "select * from hobbies ");
         if (mysqli_num_rows($hobbiesData) > 0) {
             $fetch_hobbies = mysqli_fetch_all($hobbiesData, MYSQLI_ASSOC);
             return $fetch_hobbies;
@@ -41,20 +49,11 @@ class GetData
 
     public function getEducationNamebyId($conn,$str)
     {
-        
-        // preg_match_all('!\d+!', $str, $matches);
-        // print_r($matches);
-        // $int = (int) filter_var($str, FILTER_SANITIZE_NUMBER_INT);  
-        // echo("The extracted numbers are: $int \n");
-        $numbers = preg_replace('/[^0-9]/', '', $str);
+        $number  = explode(",",$str);
+
         $return_str="";
-        // $educationData = mysqli_query($conn, "select education_name from member_education where education_id = '$numbers[0]' ");
-        // if (mysqli_num_rows($educationData) > 0) {
-        //     $fetch_hobbies = mysqli_fetch_array($educationData, MYSQLI_ASSOC);
-        //     return $fetch_hobbies['education_name'];
-        // }
-        for($i = 0; $i<strlen($numbers);$i++){
-            $getNames = mysqli_query($conn, "select education_name from member_education where education_id = '$numbers[$i]' ");
+        for($i = 0; $i<count($number);$i++){
+            $getNames = mysqli_query($conn, "select education_name from education where education_id = '$number[$i]' ");
             if (mysqli_num_rows($getNames) > 0) {
                 $fetch_names = mysqli_fetch_array($getNames, MYSQLI_ASSOC);
                 $return_str = $return_str.$fetch_names['education_name']."  ";
@@ -64,10 +63,12 @@ class GetData
     }
     public function getHobbiesNamebyId($conn,$str)
     {
-        $numbers = preg_replace('/[^0-9]/', '', $str);
+        // $numbers = preg_replace('/[^0-9]/', '', $str);
+
+        $number = explode(",", $str);
         $return_str="";
-        for($i = 0; $i<strlen($numbers);$i++){
-            $getNames = mysqli_query($conn, "select hobby_name from member_hobbies where hobby_id = '$numbers[$i]' ");
+        for($i = 0; $i<count($number);$i++){
+            $getNames = mysqli_query($conn, "select hobby_name from hobbies where hobby_id = '$number[$i]' ");
             if (mysqli_num_rows($getNames) > 0) {
                 $fetch_names = mysqli_fetch_array($getNames, MYSQLI_ASSOC);
                 $return_str = $return_str.$fetch_names['hobby_name']."  ";
@@ -75,6 +76,22 @@ class GetData
             }
         }
         return $return_str;
+    }
+
+    public function getMemberEducation($conn,$member_id){
+        $userData = mysqli_query($conn, "select education_id from members where id='$member_id' ");
+        if (mysqli_num_rows($userData) > 0) {
+            $fetch_users = mysqli_fetch_array($userData, MYSQLI_ASSOC);
+            return $fetch_users;
+        }
+    }
+
+    public function getMemberHobbies($conn,$member_id){
+        $userData = mysqli_query($conn, "select hobbies_id from members where id='$member_id' ");
+        if (mysqli_num_rows($userData) > 0) {
+            $fetch_users = mysqli_fetch_array($userData, MYSQLI_ASSOC);
+            return $fetch_users;
+        }
     }
 }
 
@@ -86,18 +103,141 @@ class Add
     public $address = "";
     public $education = "";
     public $hobbies = "";
+    public $image="";
     public $created = "";
 
     public function insert($conn)
     {
-        $insert = "insert into members(`name`, `phone`, `email`, `address`,`education_id`,`hobbies_id`) values('{$this->name}','{$this->phone}','{$this->email}','{$this->address}','{$this->education}','{$this->hobbies}');";
+        $insert = "insert into members(`name`, `phone`, `email`, `address`,`education_id`,`hobbies_id`,`image`) values('{$this->name}','{$this->phone}','{$this->email}','{$this->address}','{$this->education}','{$this->hobbies}','{$this->image}');";
         $runn = mysqli_query($conn, $insert);
-        if ($runn) {
+        $hobbies_id = explode(",", $this->hobbies);
+        $education_id = explode(",", $this->education);
+        
+        $member_info = mysqli_query($conn, "select * from members where email='{$this->email}' ");
+        $fetch_member = mysqli_fetch_array($member_info, MYSQLI_ASSOC);
+        $member_id = $fetch_member['id'];
+
+        for($i = 0; $i<count($education_id);$i++){
+            $insertEducation = mysqli_query($conn, "insert into member_education(`member_id`,`education_id`) values('$member_id','$education_id[$i]');");
+        }
+        for($i = 0; $i<count($hobbies_id);$i++){
+            $insertHobbies = mysqli_query($conn, "insert into member_hobbies(`member_id`,`hobbies_id`) values('$member_id','$hobbies_id[$i]');");
+        }
+        if ($runn && $insertEducation && $insertHobbies) {
             $this->created = "Member {$this->name} has been Created Successfully";
             return $this->created;
         }
     }
 }
+
+class EditData
+{
+    public $id = 0;
+    public $serial_id = 0;
+    public $name = "";
+    public $email = "";
+    public $phone = "";
+    public $address = "";
+    public $education = "";
+    public $hobbies = "";
+    public $image = "";
+    public $updated = "";
+
+    public function update($conn)
+    {
+        $post_education_id = explode(",", $this->education);
+        $post_hobbies_id = explode(",",$this->hobbies);
+        $getData = new GetData();
+        $db_hobbies = $getData->getMemberHobbies($conn, $this->id);
+        $db_hobbies_id = explode(",", $db_hobbies['hobbies_id']);
+        $db_education = $getData->getMemberEducation($conn, $this->id);
+        $db_education_id = explode(",", $db_education['education_id']);
+        // print_r($db_hobbies_id); 
+        // print_r($post_hobbies_id);
+        //
+        $educationdiff = array_merge(array_diff($post_education_id, $db_education_id));
+        $educationdiff2 = array_merge(array_diff($db_education_id, $post_education_id));
+        $educationiffe3 = array_merge(array_diff($educationdiff2, $post_education_id));
+        // print_r($educationdiff);
+        // print_r($educationdiff2);
+        // print_r($educationiffe3);
+        
+        $hobbiesdiff = array_merge(array_diff($post_hobbies_id, $db_hobbies_id));
+        $hobbiesdiff2 = array_merge(array_diff($db_hobbies_id, $post_hobbies_id));
+        $hobbiesiffe3 = array_merge(array_diff($hobbiesdiff2, $post_hobbies_id));
+
+        $counteducation=0;
+        $counthobbies=0;
+        if(count($educationdiff)>count($educationiffe3)){$count = count($educationdiff);}else{
+            $counteducation = count($educationiffe3);
+        }
+        if(count($hobbiesdiff)>count($hobbiesiffe3)){$count = count($hobbiesdiff);}else{
+            $counthobbies = count($hobbiesiffe3);
+        }
+        // echo $counteducation;
+        for($i = 0; $i<$counteducation;$i++){
+            if(isset($educationdiff[$i])){
+                if(strpos($db_education['education_id'],$educationdiff[$i] ) == false){
+                    $updateEducation = mysqli_query($conn, "insert into member_education (`member_id`,`education_id`) values('$this->id','$educationdiff[$i]');");
+                      echo "Insert : ".$educationdiff[$i];
+                 }
+            }
+            if(isset($educationiffe3[$i])){
+                if(strpos($this->education,$educationiffe3[$i] ) == false){
+                    $deleteEducation = mysqli_query($conn,"delete from member_education  where education_id = '$educationiffe3[$i]';");
+                     echo "Delete : ".$educationiffe3[$i];
+                }
+            }
+            
+        }
+        for($i = 0; $i<$counthobbies;$i++){
+            if(isset($hobbiesdiff[$i])){
+                if(strpos($db_hobbies['hobbies_id'],$hobbiesdiff[$i] ) == false){
+                     $updateHobbies = mysqli_query($conn, "insert into member_hobbies(`member_id`,`hobbies_id`) values('$this->id','$hobbiesdiff[$i]');");
+                      echo "Insert : ".$hobbiesdiff[$i];
+                 }
+            }
+            if(isset($hobbiesiffe3[$i])){
+                if(strpos($this->hobbies,$hobbiesiffe3[$i] ) == false){
+                     $deleteHobbies = mysqli_query($conn,"delete from member_hobbies where hobbies_id = '$hobbiesiffe3[$i]';");
+                     echo "Delete : ".$hobbiesiffe3[$i];
+                }
+            }
+            
+        }
+        $update_query = "update members set name = '{$this->name}', phone = '{$this->phone}',email = '{$this->email}', address = '{$this->address}', education_id='{$this->education}' ,hobbies_id='{$this->hobbies}', image='{$this->image}' where id = '{$this->id}';";
+        $runn = mysqli_query($conn, $update_query);
+        
+        if ($runn) {
+            $this->updated = "Member {$this->serial_id} {$this->name} has been Updated Successfully";
+            return $this->updated;
+        }
+        // for($i = 0; $i<count($db_hobbies_id);$i++){
+
+        // }
+        // //db_hobbies2 = 5,8,9,4,6
+        // $db_hobbies2 = $getData->getMemberHobbies($conn, $this->id);
+        // $db_hobbies_id2 = explode(",", $db_hobbies2['hobbies_id']);
+        // for($i = 0; $i<count($db_hobbies_id2);$i++){
+        //     if(strpos($db_hobbies['hobbies_id'],$diffrence[$i] ) !== false){
+        //         // $updateDetails = mysqli_query($conn, "insert into member_hobbies(`member_id`,`hobbies_id`) values('$this->id','$hobbies_id[$i]');");
+        //         echo "Insert : ".$diffrence[$i];
+        //     }
+        // }
+        ;
+        // $delete = "delete from member_details where member_id = '{$this->id}';";
+        // $delete_query = mysqli_query($conn, $delete);
+        
+        
+        // $count = 0;
+        // if (count($education_id)>count($hobbies_id)){ $count = count($education);}else{ $count = count($hobbies_id); }
+        // for($i = 0; $i<$count;$i++){
+        //     $updateDetails = mysqli_query($conn, "insert into member_details(`member_id`,`education_id`,`hobbies_id`) values('$this->id','$education_id[$i]','$hobbies_id[$i]');");
+        // }
+        
+    }
+}
+
 
 class CheckEmail
 {
@@ -146,6 +286,7 @@ class Validations
     public $address = "";
     public $education = "";
     public $hobbies = "";
+    public $image = "";
 
     public $nameErr = "";
     public $emailErr = "";
@@ -153,6 +294,7 @@ class Validations
     public $addressErr = "";
     public $educationErr = "";
     public $hobbiesErr = "";
+    public $imageErr = "";
 
     public function test_input($data)
     {
@@ -212,30 +354,16 @@ class Validations
     public function validate_hobbies()
     {
         if (empty($this->hobbies)) {
-            // echo "Hello" . $this->hobbies;
             $this->hobbiesErr = "<p style='color:red;'> Enter atleast one Hobby</p>";
             return $this->hobbiesErr;
         }
     }
-}
 
-class EditData
-{
-    public $id = 0;
-    public $serial_id = 0;
-    public $name = "";
-    public $email = "";
-    public $phone = "";
-    public $address = "";
-    public $updated = "";
-
-    public function update($conn)
+    public function validate_image()
     {
-        $update_query = "update members set name = '{$this->name}', phone = '{$this->phone}',email = '{$this->email}', address = '{$this->address}' where id = '{$this->id}';";
-        $runn = mysqli_query($conn, $update_query);
-        if ($runn) {
-            $this->updated = "Member {$this->serial_id} {$this->name} has been Updated Successfully";
-            return $this->updated;
+        if (empty($this->image)) {
+            $this->imageErr = "<p style='color:red;'> Upload Image</p>";
+            return $this->imageErr;
         }
     }
 }
@@ -248,8 +376,12 @@ class DeleteData
     public function delete($conn)
     {
         $delete = "delete from members where id = '{$this->id}';";
-        $runn = mysqli_query($conn, $delete);
-        if ($runn) {
+        $runn_query1 = mysqli_query($conn, $delete);
+        $delete_education = "delete from member_education where member_id = '{$this->id}';";
+        $delete_hobbies = "delete from member_hobbies where member_id = '{$this->id}';";
+        $runn_education = mysqli_query($conn, $delete_education);
+        $runn_hobbies = mysqli_query($conn, $delete_hobbies);
+        if ($runn_query1 && $runn_education && $runn_hobbies) {
             $this->deleted = "Member  {$this->serial_id} has been Deleted Successfully";
             return $this->deleted;
         }
@@ -259,13 +391,39 @@ class DeleteData
 class SearchData
 {
     public $string = "";
+    public $field_name = "name";
 
-    public function search($conn)
+    public function search($conn, $offset, $noOfRecordsPerPage)
     {
-        $search_query = mysqli_query($conn, "select * from members where name like '%$this->string%'");
+        $search_query = mysqli_query($conn, "select * from members where $this->field_name like '%$this->string%' LIMIT $offset, $noOfRecordsPerPage");
         if (mysqli_num_rows($search_query) > 0) {
             $fetch_users = mysqli_fetch_all($search_query, MYSQLI_ASSOC);
             return $fetch_users;
+        }
+    }
+}
+
+class UploadImage{
+
+
+    public function uploadimage($ImageName, $imgType, $output_dir){
+        $ImageExt = substr($ImageName, strrpos($ImageName, '.'));
+        $ImageExt = str_replace('.','',$ImageExt);
+        $RandomNum   = time();
+        $ImageName = preg_replace("/\.[^.\s]{3,4}$/", "", $ImageName);
+        $NewImageName = $ImageName.'-'.$RandomNum.'.'.$ImageExt;
+        $ret[$NewImageName]= $output_dir.$NewImageName;
+        
+        /* Try to create the directory if it does not exist */
+        if (!file_exists($output_dir))
+        {
+            @mkdir($output_dir, 0777);
+        }               
+        $upload = move_uploaded_file($_FILES["image"]["tmp_name"][0],$output_dir."/".$NewImageName );
+        if($upload){
+            return $NewImageName;
+        }else{
+            return 0;
         }
     }
 }
