@@ -91,7 +91,7 @@ if (isset($_POST['updatedata'])) {
 
 <form class="addForm" method="post" enctype="multipart/form-data">
 <input type="hidden" name="id" id="id" value="<?php echo $userData['id']; ?>" >
-<div class="singleform">
+    <div class="singleform">
         
         <label>Profile : </label>
         <img class="profileImg" src="upload/<?php echo $userData['image'] ?>" width="100px" height="100px" />
@@ -174,12 +174,12 @@ if (isset($_POST['updatedata'])) {
             <?php
                 foreach ($hobbiesData as $row):
 
-                    if(strpos($userData['hobbies_id'],$row['hobby_id'] ) !== false){
+                    if(strpos($userData['hobbies_id'],$row['hobbies_id'] ) !== false){
                 ?>
-                <input type="checkbox" name="hobbies[]" checked value="<?php echo $row['hobby_id'] ?>"><?php echo $row['hobby_name'] ?><br/>
+                <input type="checkbox" name="hobbies[]" checked value="<?php echo $row['hobbies_id'] ?>"><?php echo $row['hobby_name'] ?><br/>
                 <?php
               }else{ ?>
-                 <input type="checkbox" name="hobbies[]" value="<?php echo $row['hobby_id'] ?>"><?php echo $row['hobby_name'] ?><br/>
+                 <input type="checkbox" name="hobbies[]" value="<?php echo $row['hobbies_id'] ?>"><?php echo $row['hobby_name'] ?><br/>
                    <?php
                }
              endforeach;

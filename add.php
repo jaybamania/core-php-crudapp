@@ -111,8 +111,9 @@ if (isset($_POST['adddata'])) {
     </div>
     <div class="singleform">
         <label>Image Profile : </label>
+        <img src="" id="previewImg" alt="Profile Image" style="max-width:130px; max-height:130px;margin-top:20px; border-radius:50%;" />
+        <input type="file" name="image[]" value="<?php echo $user->image; ?>" onChange="previewFile(this)"/>
         
-        <input type="file" name="image[]" value="<?php echo $user->image; ?>"/>
         <br />
         <span style="color:red"><?php if (isset($imageErr)) {
             echo $imageErr;
@@ -168,9 +169,9 @@ if (isset($_POST['adddata'])) {
             <?php
                 foreach ($hobbiesData as $row): 
                 if($user->hobbies == ""){?>
-                    <input type="checkbox" name="hobbies[]"  value="<?php echo $row['hobby_id'] ?>"><?php echo $row['hobby_name'] ?><br/>
+                    <input type="checkbox" name="hobbies[]"  value="<?php echo $row['hobbies_id'] ?>"><?php echo $row['hobby_name'] ?><br/>
                 <?php }else{ ?>
-                     <input type="checkbox" checked name="hobbies[]"  value="<?php echo $row['hobby_id'] ?>"><?php echo $row['hobby_name'] ?><br/>
+                     <input type="checkbox" checked name="hobbies[]"  value="<?php echo $row['hobbies_id'] ?>"><?php echo $row['hobby_name'] ?><br/>
                      <?php  
                 }endforeach;
             ?>
@@ -184,5 +185,19 @@ if (isset($_POST['adddata'])) {
 </form>
 
 </div>
+
+<script>
+    function previewFile(input){
+        var file=$("input[type=file]").get(0).files[0];
+        if(file){
+            var reader = new FileReader();
+            reader.onload = function(){
+                $('#previewImg').attr("src", reader.result);
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+</script>
 </body>
 </html>

@@ -40,11 +40,23 @@
         </table>
         <ul class="pagination ">
             <li><a href="?pageno=1">First</a></li>
-            <li class="<?php if($pageno <= 1){ echo 'disabled'; } ?>">
-                <a href="<?php if($pageno <= 1){ echo '#'; } else { echo "?pageno=".($pageno - 1); } ?>">Prev</a>
-            </li>
-            <li class="<?php if($pageno >= $totalPages){ echo 'disabled'; } ?>">
-                <a href="<?php if($pageno >= $totalPages){ echo '#'; } else { echo "?pageno=".($pageno + 1); } ?>">Next</a>
-            </li>
-            <li><a href="?pageno=<?php echo $totalPages; ?>">Last</a></li>
+           
+            <?php
+                for ($i = 1; $i <= $totalPages; $i ++) {
+                if ($i == $pageno) {
+                    ?> <a href="javascript:void(0);" class=" btn btn-info current">
+                            <?php echo $i ?>
+                    </a> <?php
+                } else {
+                    ?> <a href="javascript:void(0);" class="btn btn-info pages"
+                        onclick="showRecords('<?php echo $noOfRecordsPerPage;  ?>', '<?php echo $i; ?>');">
+                            <?php echo $i ?>
+                    </a> <?php
+                } // endIf
+            } // endFor
+
+            ?>
+            <li><a href="?pageno=<?php echo $totalPages; ?>" onclick="showRecords('<?php echo $noOfRecordsPerPage;  ?>', '<?php echo $totalPages; ?>');">Last</a></li>
+            Page <?php echo $pageno; ?>
+            of <?php echo $totalPages; ?>
         </ul>
