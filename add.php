@@ -7,8 +7,8 @@ include "classes/operations.php";
 use Ops as O;
 $user = new O\Add();
 require "include/connect.php";
-if (isset($_POST['adddata'])) {
-    
+if (isset($_POST['name']) && isset($_POST['email']) && isset($_POST['phone']) && isset($_POST['address'])) {
+
     $user->name = $_POST['name'];
     $user->email = $_POST['email'];
     $user->phone = $_POST['phone'];
@@ -24,7 +24,7 @@ if (isset($_POST['adddata'])) {
     //     $user->image = $imgContent;
         
     // }
-    $output_dir = "upload/";/* Path for file upload */
+    $output_dir = "uploads/";/* Path for file upload */
 	$RandomNum   = time();
 	$ImageName      = str_replace(' ','-',strtolower($_FILES['image']['name'][0]));
 	$ImageType      = $_FILES['image']['type'][0];
@@ -38,7 +38,7 @@ if (isset($_POST['adddata'])) {
 	/* Try to create the directory if it does not exist */
 	if (!file_exists($output_dir))
 	{
-		@mkdir($output_dir, 0777);
+		mkdir($output_dir, 0777);
 	}               
 	move_uploaded_file($_FILES["image"]["tmp_name"][0],$output_dir."/".$NewImageName );
     // $imageVar = new O\UploadImage();
@@ -93,13 +93,28 @@ if (isset($_POST['adddata'])) {
 }
 ?>
 <body>
+<div class="result"></div>
 <div class="mainbody">
 
 <h4 style="color:red; font-size:2vw;"><?php if (isset($duplicate)) {
     echo $duplicate;
 } ?></h4>
-<form class="addForm" method="POST" enctype="multipart/form-data">
-<div class="singleform">
+<button class="btn btn-info mainpage m-2">Go to Mainpage</button>
+<script>$('.mainpage').click(function(){
+    // AJAX Request
+    $.ajax({
+    url: 'adminpage.php',
+    success: function(response){
+        $('.mainbody').hide();
+        $('.heading').hide();
+        history.pushState({},'',"index.php");
+        $('#results').html(response);
+    }
+    });
+});</script>
+<span class="response"></span>
+<form class="addForm"  method="POST" action="add.php" enctype="multipart/form-data">
+<div class="form-gorup">
         <label>Name : </label>
         
         <input type="text" name="name" id="name" value="<?php echo $user->name; ?>">
@@ -180,12 +195,12 @@ if (isset($_POST['adddata'])) {
             echo $hobbiesErr;
         } ?></span> 
         </div>
-            <button type="submit" name="adddata">Submit</button>
+            <button type="submit" class="btn btn-success" name="adddata">Submit</button>
     
 </form>
 
 </div>
-
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script>
     function previewFile(input){
         var file=$("input[type=file]").get(0).files[0];
@@ -197,6 +212,86 @@ if (isset($_POST['adddata'])) {
             reader.readAsDataURL(file);
         }
     }
+
+$(function(){
+
+    var form = $(".addform");
+
+    form.submit(function(e){
+
+        $(this).attr("disabled","disabled");
+        e.preventDefault();
+
+        $.ajax({
+            type: form.attr("method"),
+            url : form.attr('action'),
+            data : form.serialize(),
+            dataType:"json", //response data type
+            success:function(data){
+                $(".response").text(data.content);
+            }
+            error:function(data){
+                $(".response").text("Error Occured");
+            }
+        })
+    })
+
+})
+
+
+// $('.addForm').on('submit', function (e) {
+
+//   e.preventDefault();
+
+//   $.ajax({
+//     type: 'post',
+//     url: 'add.php',
+//     data: $('form').serialize(),
+    
+//     success: function (response) {
+//         console.log(response);
+//         $("#show").text($("form").serialize());
+//       alert('form was submitted');
+//     }
+//   });
+
+// });
+
+// });
+
+  $(document).ready(function () {
+
+//     $(".addform").submit(function (event) {
+//     var formData = {
+//       name: $("#name").val(),
+//       email: $("#email").val(),
+//       phone: $("#phone").val(),
+//       address: $("#address").val(),
+//     };
+
+//     $.ajax({
+//       type: "POST",
+//       url: "add.php",
+//       data: formData,
+//       dataType: "json",
+//       encode: true,
+//     }).done(function (data) {
+//       console.log(data);
+//       if (!data.success) {
+//         if (data.errors.name) {
+//           $("#name-group").addClass("has-error");
+//           $("#name-group").append(
+//             '<div class="help-block">' + data.errors.name + "</div>"
+//           );
+//         }
+//     });
+
+//     event.preventDefault();
+//   });
+
+
+
+})
 
 </script>
 </body>

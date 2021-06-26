@@ -17,7 +17,7 @@
             foreach ($paginationData as $row): ?>
                     <tr class="indextr">
                         <td class="indextd"><?php echo ($offset + $i++); ?></td>
-                        <td class="indextd"><img class="profileImg" src="upload/<?php echo $row['image'] ?>" width="100px" height="100px" /></td>
+                        <td class="indextd"><img class="profileImg" src="uploads/<?php echo $row['image'] ?>" width="100px" height="100px" /></td>
                         <td class="indextd"><?php echo $row['name']; ?></td>
                         <td class="indextd"><?php echo $row['email']; ?></td>
                         <td class="indextd"><?php echo $row['phone']; ?></td>
@@ -26,8 +26,14 @@
                         <td class="indextd"><?php $getEducationName = $getData->getEducationNamebyId($conn,$row['education_id']); echo $getEducationName;  ?></td>
                         <td class="indextd"><?php $getHobbiesName = $getData->getHobbiesNamebyId($conn,$row['hobbies_id']); echo $getHobbiesName;  ?></td>
                         <td class="operations indextd">
-                            <a class="deleteButton btn btn-danger" href="delete.php?id=<?php echo $row['id']; ?>&&i=<?php echo $i - 1; ?>">Delete</a>
-                            <a class="editButton btn btn-warning" href="edit.php?id=<?php echo $row['id']; ?>&&i=<?php echo $i - 1; ?>">Edit</a>
+                            <a  class="deleteButton btn btn-danger" 
+                                data-i = '<?= $i-1 ?>'   
+                                data-id='<?= $row['id'];  ?>'
+                                >Delete</a>
+                            <a  class="editButton btn btn-warning" 
+                                data-i = '<?= $i-1 ?>' 
+                                data-id='<?= $row['id'];  ?>'
+                            >Edit</a>
                         </td>
                     </tr>
                     <?php endforeach;

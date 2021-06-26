@@ -1,6 +1,6 @@
 <div class="performSection">
     <div class="addButton">
-        <button ><a href="add.php">+ Add Member</a></button>
+        <button ><a >+ Add Member</a></button>
     </div>
     <form method="post">
     <label for="filterby">Filter By:</label>

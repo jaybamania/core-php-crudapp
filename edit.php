@@ -33,7 +33,7 @@ if (isset($_POST['updatedata'])) {
     if (!$nameErr && !$emailErr && !$phoneErr && !$addressErr && !$hobbiesErr && !$educationErr) {
         $updated_user = new O\EditData();
         if($_FILES['image']['name'][0]){
-            $output_dir = "upload/";/* Path for file upload */
+            $output_dir = "uploads/";/* Path for file upload */
             $RandomNum   = time();
             $ImageName      = str_replace(' ','-',strtolower($_FILES['image']['name'][0]));
             $ImageType      = $_FILES['image']['type'][0];
@@ -94,7 +94,7 @@ if (isset($_POST['updatedata'])) {
     <div class="singleform">
         
         <label>Profile : </label>
-        <img class="profileImg" src="upload/<?php echo $userData['image'] ?>" width="100px" height="100px" />
+        <img class="profileImg" src="uploads/<?php echo $userData['image'] ?>" width="100px" height="100px" />
         <input type="file" name="image[]"/>
         <br />
         <span style="color:red"><?php if (isset($nameErr)) {

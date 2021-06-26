@@ -1,8 +1,4 @@
-<?php
-$my_header = 'Admin Panel';
-include "include/header.php";
-require "include/connect.php";
-?>
+
 <html>
 <head>
 
@@ -17,14 +13,8 @@ require "include/connect.php";
 <body>
     <div id="container">
         <div id="inner-container">
-        
-    <h4 style="color:green; font-size:2vw;"><?php
-        session_start();
-        if (isset($_SESSION['success'])) {
-            echo $_SESSION['success'];
-            unset($_SESSION['success']);
-        }
-    ?></h4>
+       
+    
             <div id="results"></div>
             <div id="loader"></div>
 
@@ -49,6 +39,14 @@ require "include/connect.php";
     
     $(document).ready(function() {
         showRecords(1, 1);
+        $.ajax({
+            url:"adminpage.php",
+            success:function(html){
+                $("#results").html(html);
+                $('#loader').html(''); 
+            }
+        })
+        
     });
 </script>
 </html>

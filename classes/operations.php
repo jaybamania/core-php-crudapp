@@ -64,11 +64,11 @@ class GetData
     public function getHobbiesNamebyId($conn,$str)
     {
         // $numbers = preg_replace('/[^0-9]/', '', $str);
-
+        print_r($str);
         $number = explode(",", $str);
         $return_str="";
         for($i = 0; $i<count($number);$i++){
-            $getNames = mysqli_query($conn, "select hobby_name from hobbies where hobby_id = '$number[$i]' ");
+            $getNames = mysqli_query($conn, "select hobby_name from hobbies where hobbies_id = '$number[$i]' ");
             if (mysqli_num_rows($getNames) > 0) {
                 $fetch_names = mysqli_fetch_array($getNames, MYSQLI_ASSOC);
                 $return_str = $return_str.$fetch_names['hobby_name']."  ";
