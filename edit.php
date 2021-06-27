@@ -94,8 +94,8 @@ if (isset($_POST['updatedata'])) {
     <div class="singleform">
         
         <label>Profile : </label>
-        <img class="profileImg" src="uploads/<?php echo $userData['image'] ?>" width="100px" height="100px" />
-        <input type="file" name="image[]"/>
+        <img class="profileImg" id="previewImg" src="uploads/<?php echo $userData['image'] ?>" width="100px" height="100px" />
+        <input type="file" name="image[]" onChange="previewFile(this)"/>
         <br />
         <span style="color:red"><?php if (isset($nameErr)) {
             echo $nameErr;
@@ -194,5 +194,17 @@ if (isset($_POST['updatedata'])) {
 </form>
 
 </div>
+<script>
+    function previewFile(input){
+        var file=$("input[type=file]").get(0).files[0];
+        if(file){
+            var reader = new FileReader();
+            reader.onload = function(){
+                $('#previewImg').attr("src", reader.result);
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+</script>
 </body>
 </html>

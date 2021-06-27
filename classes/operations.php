@@ -307,20 +307,20 @@ class Validations
     public function validate_name()
     {
         if (empty($this->name)) {
-            $this->nameErr = "<p style='color:red;'> Name is Required</p>";
+            $this->nameErr = " Name is Required";
             return $this->nameErr;
         }
     }
     public function validate_email()
     {
         if (empty($this->email)) {
-            $this->emailErr = "<p style='color:red;'> Email is Required</p>";
+            $this->emailErr = " Email is Required";
             return $this->emailErr;
         } else {
             $this->email = $this->test_input($_POST["email"]);
 
             if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
-                $this->emailErr = "<p style='color:red;'> Invalid Email Format</p>";
+                $this->emailErr = " Invalid Email Format";
                 return $this->emailErr;
             }
         }

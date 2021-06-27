@@ -41,22 +41,7 @@ $paginationData = $getData->getAllData($conn,$offset,$noOfRecordsPerPage);
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
    
 <script type="text/javascript">
-    // function deleteRecords(id,i) {
-    //     console.log(id);
-    //     console.log(i);
-    //     $.ajax({
-    //         type: "GET",
-    //         url: "delete.php",
-    //         data: {id:id,i:i},
-    // 		dataType: "html",
-    //         success: function(data) {
-    //             // $("#results").html(html);
-    //             // $('#loader').html('');
-    //             alert("Deleted Succesfully") ;
-    //             $('').load('index.php');
-    //         }
-    //     });
-    // }
+
 
     $(document).ready(function(){
 
@@ -101,29 +86,14 @@ $('.editButton').click(function(){
   console.log(editid);
   console.log(serialid);
 
-     // AJAX Request
      $.ajax({
        url: "edit.php?id="+editid,
-      //  data: { id:editid},
        success: function(response){
         console.log(response)
         $('.mainbody').hide();
         $('.heading').hide();
-        history.pushState({},'',"edit.php");
+        history.pushState({},'',"edit.php?id="+editid);
         $('#result').html(response);
-        
-        
-    //     if(response !== ""){
-    //    // Remove row from HTML Table
-    //    $(el).closest('tr').css('background','tomato');
-    //    $(el).closest('tr').fadeOut(800,function(){
-
-    //       $(this).remove();
-    //    });
-    //      }else{
-    //    alert('Invalid ID.');
-    //      }
-
        }
      });
 
