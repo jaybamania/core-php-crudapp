@@ -64,7 +64,7 @@ class GetData
     public function getHobbiesNamebyId($conn,$str)
     {
         // $numbers = preg_replace('/[^0-9]/', '', $str);
-        print_r($str);
+        
         $number = explode(",", $str);
         $return_str="";
         for($i = 0; $i<count($number);$i++){

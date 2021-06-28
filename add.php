@@ -5,21 +5,33 @@ include "classes/operations.php";
 use Ops as O;
 $user = new O\Add();
 require "include/connect.php";
-if(isset($_POST['ajax'])){
+// if(isset($_POST['ajax'])){
+    if(isset($_POST['name']) || isset($_POST['email']) || isset($_POST['phone']) || isset($_POST['address']) || isset($_POST['education']) || isset($_POST['hobbies']) || isset($_FILES['file']['name'])){
     $user->name = $_POST['name'];
     $user->email = $_POST['email'];
     $user->phone = $_POST['phone'];
     $user->address = $_POST['address'];
-    $user->education = $_POST['education'];
-    $user->hobbies =  $_POST['hobbies'];
+    if(isset($_POST['education'])){$user->education = implode(',', $_POST['education']); }
+    if(isset($_POST['hobbies'])){$user->hobbies = implode(',', $_POST['hobbies']); }
 
     //Image Name
-    $ImageName      = str_replace(' ','-',strtolower($_POST['image']));
-    $RandomNum   = time();
-    $ImageExt = substr($ImageName, strrpos($ImageName, '.'));
+    $output_dir = "uploads/";/* Path for file upload */
+	$RandomNum   = time();
+	$ImageName      = str_replace(' ','-',strtolower($_FILES['file']['name']));
+	$ImageType      = $_FILES['file']['type'];
+ 
+	$ImageExt = substr($ImageName, strrpos($ImageName, '.'));
 	$ImageExt       = str_replace('.','',$ImageExt);
 	$ImageName      = preg_replace("/\.[^.\s]{3,4}$/", "", $ImageName);
 	$NewImageName = $ImageName.'-'.$RandomNum.'.'.$ImageExt;
+    $ret[$NewImageName]= $output_dir.$NewImageName;
+	
+	/* Try to create the directory if it does not exist */
+	if (!file_exists($output_dir))
+	{
+		mkdir($output_dir, 0777);
+	}               
+	move_uploaded_file($_FILES["file"]["tmp_name"],$output_dir."/".$NewImageName );
     $user->image = $NewImageName;
     // $_POST['education'])){$user->education = implode(',', $_POST['education']);
     $validation = new O\Validations();
@@ -27,8 +39,8 @@ if(isset($_POST['ajax'])){
     $validation->email = $_POST['email'];
     $validation->phone = $_POST['phone'];
     $validation->address = $_POST['address'];
-    $validation->education = $_POST['education'];
-    $validation->hobbies =  $_POST['hobbies'];
+    if(isset($_POST['education'])){$validation->education = implode(',', $_POST['education']); }
+    if(isset($_POST['hobbies'])){$validation->hobbies = implode(',', $_POST['hobbies']);}
     $validation->image = $ImageName ;
     //Variables for Error Messages
     $duplicate = $nameErr = $emailErr = $phoneErr = $addressErr = $hobbiesErr = $educationErr = $imageErr = ""; 
@@ -40,27 +52,29 @@ if(isset($_POST['ajax'])){
     $addressErr = $validation->validate_address();
     $educationErr = $validation->validate_education();
     $hobbiesErr = $validation->validate_hobbies();
-    // $imageErr = $validation->validate_image();
-    if (!$nameErr && !$emailErr && !$phoneErr && !$addressErr && !$hobbiesErr && !$educationErr) {
+    $imageErr = $validation->validate_image();
+    if (!$nameErr && !$emailErr && !$phoneErr && !$addressErr && !$hobbiesErr && !$educationErr && !$imageErr) {
         //Check Email if already exists
         $check_email = new O\CheckEmail();
         $check_email->email = $_POST['email'];
         $duplicate = $check_email->checkEmail($conn);
+        // if Email Already Msg doesn't get, then insert the data
         if (!$duplicate) {
-            echo "<script language='javascript'>
-            history.pushState({},'','index.php');
             
-            </script>";
-            header('Location: index.php');
-            //if Email Already Mesg doesn't get then insert the data
-            // $created = $user->insert($conn);
-            // if (!$created) {
-            //     echo "Error:" . mysqli_error($conn);
-            // } else {
-            //     session_start();
-            //     $_SESSION['success'] = $created;
-            //     header('Location: index.php');
-            // }
+            // header('Location: index.php');
+           
+            $created = $user->insert($conn);
+            if (!$created) {
+                echo "Error:" . mysqli_error($conn);
+            } else {
+                session_start();
+                $_SESSION['success'] = $created;
+                echo "<script language='javascript'>
+                location.replace('index.php')
+                
+                </script>";
+                header('Location: index.php');
+            }
         }
     
 }
@@ -95,8 +109,8 @@ if(isset($_POST['ajax'])){
     // $user->email = $_POST['email'];
     // $user->phone = $_POST['phone'];
     // $user->address = $_POST['address'];
-//     if(isset($_POST['education'])){$user->education = implode(',', $_POST['education']); }
-//     if(isset($_POST['hobbies'])){$user->hobbies = implode(',', $_POST['hobbies']); }
+    // if(isset($_POST['education'])){$user->education = implode(',', $_POST['education']); }
+    // if(isset($_POST['hobbies'])){$user->hobbies = implode(',', $_POST['hobbies']); }
 //     //Inserting Image
 //     // $check = getimagesize($_FILES["image"]["tmp_name"]);
 //     // if($check !== false){
@@ -106,23 +120,23 @@ if(isset($_POST['ajax'])){
 //     //     $user->image = $imgContent;
         
 //     // }
-//     $output_dir = "uploads/";/* Path for file upload */
-// 	$RandomNum   = time();
-// 	$ImageName      = str_replace(' ','-',strtolower($_FILES['image']['name'][0]));
-// 	$ImageType      = $_FILES['image']['type'][0];
+    // $output_dir = "uploads/";/* Path for file upload */
+	// $RandomNum   = time();
+	// $ImageName      = str_replace(' ','-',strtolower($_FILES['image']['name'][0]));
+	// $ImageType      = $_FILES['image']['type'][0];
  
 	// $ImageExt = substr($ImageName, strrpos($ImageName, '.'));
 	// $ImageExt       = str_replace('.','',$ImageExt);
 	// $ImageName      = preg_replace("/\.[^.\s]{3,4}$/", "", $ImageName);
 	// $NewImageName = $ImageName.'-'.$RandomNum.'.'.$ImageExt;
-//     $ret[$NewImageName]= $output_dir.$NewImageName;
+    // $ret[$NewImageName]= $output_dir.$NewImageName;
 	
-// 	/* Try to create the directory if it does not exist */
-// 	if (!file_exists($output_dir))
-// 	{
-// 		mkdir($output_dir, 0777);
-// 	}               
-// 	move_uploaded_file($_FILES["image"]["tmp_name"][0],$output_dir."/".$NewImageName );
+	// /* Try to create the directory if it does not exist */
+	// if (!file_exists($output_dir))
+	// {
+	// 	mkdir($output_dir, 0777);
+	// }               
+	// move_uploaded_file($_FILES["image"]["tmp_name"][0],$output_dir."/".$NewImageName );
 //     // $imageVar = new O\UploadImage();
 //     // $imageUpload = $imageVar->uploadimage($ImageName,$ImageType,$output_dir);
 //     $user->image = $NewImageName; 
@@ -132,8 +146,8 @@ if(isset($_POST['ajax'])){
     // $validation->phone = $_POST['phone'];
     // $validation->address = $_POST['address'];
     // $validation->image = $ImageName ;
-//     if(isset($_POST['education'])){$validation->education = implode(',', $_POST['education']); }
-//     if(isset($_POST['hobbies'])){$validation->hobbies = implode(',', $_POST['hobbies']);}
+    // if(isset($_POST['education'])){$validation->education = implode(',', $_POST['education']); }
+    // if(isset($_POST['hobbies'])){$validation->hobbies = implode(',', $_POST['hobbies']);}
     // //Variables for Error Messages
     // $duplicate = $nameErr = $emailErr = $phoneErr = $addressErr = $hobbiesErr = $educationErr = $imageErr = ""; 
     // //Variable for Successful Message
@@ -183,23 +197,26 @@ if(isset($_POST['ajax'])){
 } ?></h4>
 <button class="btn btn-info mainpage m-2">Go to Mainpage</button>
 <script>
-$('.mainpage').click(function(){
+$('.mainpage').click(function(e){
+  
     // AJAX Request
     $.ajax({
     url: 'adminpage.php',
+    dataType:'html',
     success: function(response){
+       
         $('.mainbody').hide();
         $('.heading').hide();
         history.pushState({},'',"index.php");
         $('#results').html(response);
+        
     }
     });
 });
-
 </script>
 <span class="errors" style='color:red;'></span>
 <span class="response" style='color:green;'></span>
-<form class="addForm"  method="POST"  >
+<form class="addForm"  method="POST"  enctype="multipart/form-data">
 <div class="form-gorup">
 <?php echo $user->name." ".$user->email." ".$user->phone." ".$user->address."  ".$user->education." ".$user->hobbies." >> ".$user->image; ?>
         <label>Name : </label>
@@ -214,7 +231,7 @@ $('.mainpage').click(function(){
     <div class="singleform">
         <label>Image Profile : </label>
         <img src="" id="previewImg" alt="Profile Image" style="max-width:130px; max-height:130px;margin-top:20px; border-radius:50%;" />
-        <input type="file" class="profile" name="file" value="<?php echo $user->image; ?>" onChange="previewFile(this)"/>
+        <input type="file" class="profile" id="file" name="file" value="<?php echo $user->image; ?>" onChange="previewFile(this)"/>
         
         <br />
         <span style="color:red"><?php if (isset($imageErr)) {
@@ -282,7 +299,7 @@ $('.mainpage').click(function(){
             echo $hobbiesErr;
         } ?></span> 
         </div>
-            <button type="submit" class="btn btn-success memberdata" name="">Submit</button>
+            <button type="submit" class="btn btn-success submitBtn" name="">Submit</button>
     
 </form>
 
@@ -292,6 +309,13 @@ $('.mainpage').click(function(){
     function previewFile(input){
         var file=$("input[type=file]").get(0).files[0];
         if(file){
+            var fileType = file.type;
+            var match = ['image/jpeg', 'image/png', 'image/jpg'];
+            if(!((fileType == match[0]) || (fileType == match[1]) || (fileType == match[2]))){
+                alert('Sorry, only JPG, JPEG, & PNG files are allowed to upload.');
+                $("#file").val('');
+                return false;
+            }
             var reader = new FileReader();
             reader.onload = function(){
                 $('#previewImg').attr("src", reader.result);
@@ -300,6 +324,16 @@ $('.mainpage').click(function(){
             reader.readAsDataURL(file);
         }
     }
+    // $("#file").change(function() {
+    // var file = this.files[0];
+    // var fileType = file.type;
+    // var match = ['application/pdf', 'application/msword', 'application/vnd.ms-office', 'image/jpeg', 'image/png', 'image/jpg'];
+    // if(!((fileType == match[0]) || (fileType == match[1]) || (fileType == match[2]) || (fileType == match[3]) || (fileType == match[4]) || (fileType == match[5]))){
+    //     alert('Sorry, only PDF, DOC, JPG, JPEG, & PNG files are allowed to upload.');
+    //     $("#file").val('');
+    //     return false;
+    // }
+
 // $(".addForm").submit(function(e) {
 
 // e.preventDefault(); // avoid to execute the actual submit of the form.
@@ -329,10 +363,7 @@ $('.mainpage').click(function(){
         var name = $("#name").val()
         // var file = ('input[type=file]')[0].files[0].name 
         var filename = $('input[type=file]').val().replace(/C:\\fakepath\\/i, '')
-        // var file_data = $('.profile').prop('files')[0];
-        // var form_data = new FormData();                  
-        // form_data.append('image', file_data);
-        // alert(form_data)
+
         var email = $("#email").val()
         var phone = $("#phone").val()
         var address = $("#address").val()
@@ -358,116 +389,39 @@ $('.mainpage').click(function(){
         $.ajax({
             type: "POST",
             url:"add.php",
-            data: {ajax:1,name: name,email:email,phone: phone,address:address, education:educationList,hobbies:hobbiesList,image:filename}, // serializes the form's elements.
-            
+            //data: {ajax:1,name: name,email:email,phone: phone,address:address, education:educationList,hobbies:hobbiesList,image:filename}, // serializes the form's elements.
+            data: new FormData(this),
+            dataType: 'html',
+            contentType: false,
+            cache: false,
+            processData:false,
+            beforeSend: function(){
+                $('.submitBtn').attr("disabled","disabled");
+                $('.addForm').css("opacity",".5");
+            },
             success: function(data)
             {   
-               
                 $('.mainbody').hide();
                 $('.heading').hide();
-                $('.result').html(data);
-                // $.ajax({
-                //     url:"index.php",
-                //     success:function(response){
-                //         console.log(response)
-                //         history.pushState({},'',"index.php");
-                //         e.preventDefault();
-                //         $('#results').html(response);
-                //     }
-                // })
-                // console.log(data);
                
-             
-              
-                // if(nameError !== ""){
-                //     $("#nameerror").html(nameError);
-                // }
-                // if(data.name || data.email !== ""){
-                //     $(".response").html(data); 
-                // }
+                $('.result').html(data);
+                $('.fupForm').css("opacity","");
+                $(".submitBtn").removeAttr("disabled");
+                $.ajax({
+                    url:"adminpage.php",
+                    success:function(response){
+                        console.log(response)
+                        history.pushState({},'',"index.php");
+                        $('.statusMsg').html('<p class="alert alert-success">Member Added Successfully</p>');
+                        $('.statusMsg').fadeOut(5000);
+                    }
+                })
             }
         });
         
     });
-// $(function(){
-
-//     var form = $(".addform");
-
-//     form.submit(function(e){
-
-//         $(this).attr("disabled","disabled");
-//         e.preventDefault();
-
-//         $.ajax({
-//             type: form.attr("method"),
-//             url : "add.php",
-//             data : form.serialize(),
-//             dataType:"json", //response data type
-//             success:function(data){
-//                 $(".response").text(data.content);
-//             }
-//             error:function(data){
-//                 $(".response").text("Error Occured");
-//             }
-//         })
-//     })
-
-// })
 
 
-// $('.addForm').on('submit', function (e) {
-
-//   e.preventDefault();
-
-//   $.ajax({
-//     type: 'post',
-//     url: 'add.php',
-//     data: $('form').serialize(),
-    
-//     success: function (response) {
-//         console.log(response);
-//         $("#show").text($("form").serialize());
-//       alert('form was submitted');
-//     }
-//   });
-
-// });
-
-// });
-
-  $(document).ready(function () {
-
-//     $(".addform").submit(function (event) {
-//     var formData = {
-//       name: $("#name").val(),
-//       email: $("#email").val(),
-//       phone: $("#phone").val(),
-//       address: $("#address").val(),
-//     };
-
-//     $.ajax({
-//       type: "POST",
-//       url: "add.php",
-//       data: formData,
-//       dataType: "json",
-//       encode: true,
-//     }).done(function (data) {
-//       console.log(data);
-//       if (!data.success) {
-//         if (data.errors.name) {
-//           $("#name-group").addClass("has-error");
-//           $("#name-group").append(
-//             '<div class="help-block">' + data.errors.name + "</div>"
-//           );
-//         }
-//     });
-
-//     event.preventDefault();
-//   });
-
-
-
-})
 
 </script>
 </body>

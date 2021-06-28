@@ -18,24 +18,18 @@ $totalPages = ceil($totalRows / $noOfRecordsPerPage);
 $paginationData = $getData->getAllData($conn,$offset,$noOfRecordsPerPage);
 
 ?>
-
+<div id="results"></div>
 <div class="mainbody">
 <?php
         require_once "components/performsection.php";
     ?>
-    <h4 style="color:green; font-size:2vw;"><?php
-        session_start();
-        if (isset($_SESSION['success'])) {
-            echo $_SESSION['success'];
-            unset($_SESSION['success']);
-        }
-    ?></h4>
+    <div class="statusMsg"></div>
        
         <?php
         require_once "components/datatable.php";
     ?>
 </div>
-<div id="result"></div>
+
 
 
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
@@ -43,10 +37,12 @@ $paginationData = $getData->getAllData($conn,$offset,$noOfRecordsPerPage);
 <script type="text/javascript">
 
 
-    $(document).ready(function(){
+    $(document).ready(function(
+      e){
+     
 
 // Delete 
-$('.deleteButton').click(function(){
+$('.deleteButton').click(function(e){
   var el = this;
   // Delete id
   var deleteid = $(this).data('id');
@@ -61,12 +57,13 @@ $('.deleteButton').click(function(){
        success: function(response){
         console.log(response)
         if(response !== ""){
+          $('.statusMsg').html('<p class="alert alert-success">Deleted Successfully</p>');
        // Remove row from HTML Table
        $(el).closest('tr').css('background','tomato');
-       $(el).closest('tr').fadeOut(800,function(){
-
+       $(el).closest('tr').fadeOut(300,function(){
           $(this).remove();
        });
+       $('.statusMsg').fadeOut(3000);
          }else{
        alert('Invalid ID.');
          }
@@ -93,7 +90,7 @@ $('.editButton').click(function(){
         $('.mainbody').hide();
         $('.heading').hide();
         history.pushState({},'',"edit.php?id="+editid);
-        $('#result').html(response);
+        $('#results').html(response);
        }
      });
 
@@ -110,7 +107,7 @@ $('.addButton').click(function(){
         $('.mainbody').hide();
         $('.heading').hide();
         history.pushState({},'',"add.php");
-        $('#result').html(response);
+        $('#results').html(response);
         
        }
      });

@@ -83,12 +83,31 @@ if (isset($_POST['updatedata'])) {
 }
 ?>
 <body>
+
+
 <div class="mainbody">
 
 <h4 style="color:red; font-size:2vw;"><?php if (isset($duplicate)) {
     echo $duplicate;
 } ?></h4>
-
+<button class="btn btn-info mainpage m-2">Go to Mainpage</button>
+<script>
+$('.mainpage').click(function(e){
+  
+    // AJAX Request
+    $.ajax({
+    url: 'adminpage.php',
+    dataType:'html',
+    success: function(response){
+        $('.mainbody').hide();
+        $('.heading').hide();
+        history.pushState({},'',"index.php");
+        $('#results').html(response);
+        
+    }
+    });
+});
+</script>
 <form class="addForm" method="post" enctype="multipart/form-data">
 <input type="hidden" name="id" id="id" value="<?php echo $userData['id']; ?>" >
     <div class="singleform">
@@ -190,7 +209,7 @@ if (isset($_POST['updatedata'])) {
             echo $hobbiesErr;
         } ?></span> 
         </div>
-    <button type="submit" name="updatedata">Submit</button>
+        <button type="submit" class="btn btn-success submitBtn" name="">Submit</button>
 </form>
 
 </div>
