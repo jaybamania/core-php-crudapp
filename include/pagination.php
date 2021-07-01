@@ -6,7 +6,7 @@ if (isset($_GET['pageno'])) {
     $pageno = 1;
 }
 $totalPages = 0;
-$noOfRecordsPerPage = 2;
+$noOfRecordsPerPage = 4;
 $offset = ($pageno-1) * $noOfRecordsPerPage;
 
 // $getData = new O\GetData();

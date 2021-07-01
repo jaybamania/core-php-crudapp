@@ -16,22 +16,22 @@ require "include/connect.php";
 
     //Image Name
     $output_dir = "uploads/";/* Path for file upload */
-	$RandomNum   = time();
-	$ImageName      = str_replace(' ','-',strtolower($_FILES['file']['name'][0]));
-	$ImageType      = $_FILES['file']['type'][0];
- 
-	$ImageExt = substr($ImageName, strrpos($ImageName, '.'));
-	$ImageExt       = str_replace('.','',$ImageExt);
-	$ImageName      = preg_replace("/\.[^.\s]{3,4}$/", "", $ImageName);
-	$NewImageName = $ImageName.'-'.$RandomNum.'.'.$ImageExt;
+    $RandomNum   = time();
+    $ImageName      = str_replace(' ','-',strtolower($_FILES['file']['name'][0]));
+    $ImageType      = $_FILES['file']['type'][0];
+
+    $ImageExt = substr($ImageName, strrpos($ImageName, '.'));
+    $ImageExt       = str_replace('.','',$ImageExt);
+    $ImageName      = preg_replace("/\.[^.\s]{3,4}$/", "", $ImageName);
+    $NewImageName = $ImageName.'-'.$RandomNum.'.'.$ImageExt;
     $ret[$NewImageName]= $output_dir.$NewImageName;
-	
-	/* Try to create the directory if it does not exist */
-	if (!file_exists($output_dir))
-	{
-		mkdir($output_dir, 0777);
-	}               
-	move_uploaded_file($_FILES["file"]["tmp_name"][0],$output_dir."/".$NewImageName );
+    
+    /* Try to create the directory if it does not exist */
+    if (!file_exists($output_dir))
+    {
+        mkdir($output_dir, 0777);
+    }               
+    move_uploaded_file($_FILES["file"]["tmp_name"][0],$output_dir."/".$NewImageName );
     $user->image = $NewImageName;
     // $_POST['education'])){$user->education = implode(',', $_POST['education']);
     $validation = new O\Validations();
@@ -69,11 +69,11 @@ require "include/connect.php";
             } else {
                 session_start();
                 $_SESSION['success'] = $created;
-                echo "<script language='javascript'>
-                location.replace('index.php')
-                
-                </script>";
-                header('Location: index.php');
+                // echo '<script type="text/javascript">';
+                // echo ' history.pushState({},"","index.php");';
+                // echo '</script>'; 
+                echo '<script>history.pushState({},"","index.php")</script>';
+                header("Location: adminpage.php");
             }
         }
     
@@ -231,7 +231,7 @@ $('.mainpage').click(function(e){
     <div class="singleform">
         <label>Image Profile : </label>
         <img src="" id="previewImg" alt="Profile Image" style="max-width:130px; max-height:130px;margin-top:20px; border-radius:50%;" />
-        <input type="file" class="profile" id="file" name="file" value="<?php echo $user->image; ?>" onChange="previewFile(this)"/>
+        <input type="file" class="profile" id="file" name="file[]" value="<?php echo $user->image; ?>" onChange="previewFile(this)"/>
         
         <br />
         <span style="color:red"><?php if (isset($imageErr)) {
@@ -256,7 +256,7 @@ $('.mainpage').click(function(e){
     <div  class="singleform">
         <label>Address : </label>
         <textarea  name="address" id="address">
-        <?php echo $user->phone; ?>
+        <?php echo $user->address; ?>
         </textarea>
         <span style="color:red"><?php if (isset($addressErr)) {
             echo $addressErr;
@@ -369,7 +369,13 @@ $('.mainpage').click(function(e){
         var address = $("#address").val()
         var education = [];
         var hobbies = [];
-        
+        var success_msg = ""
+        <?php if(isset($_SESSION['success'])){
+            ?>
+           success_msg="<?php echo $_SESSION['success'];?>"
+            <?php 
+        }
+        ?>
         $.each($(".education option:selected"), function(){            
             education.push($(this).val());
         });
@@ -407,15 +413,10 @@ $('.mainpage').click(function(e){
                 $('.result').html(data);
                 $('.fupForm').css("opacity","");
                 $(".submitBtn").removeAttr("disabled");
-                $.ajax({
-                    url:"adminpage.php",
-                    success:function(response){
-                        console.log(response)
-                        history.pushState({},'',"index.php");
-                        $('.statusMsg').html('<p class="alert alert-success">Member Added Successfully</p>');
-                        $('.statusMsg').fadeOut(5000);
-                    }
-                })
+                if(success_msg !== "" ){
+                    history.pushState({},'',"index.php");
+                    showRecords(1,1)
+                }
             }
         });
         

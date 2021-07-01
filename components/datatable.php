@@ -27,13 +27,14 @@
                         <td class="indextd"><?php $getHobbiesName = $getData->getHobbiesNamebyId($conn,$row['hobbies_id']); echo $getHobbiesName;  ?></td>
                         <td class="operations indextd">
                             <a  class="deleteButton btn btn-danger" 
-                                data-i = '<?= $i-1 ?>'   
+                                data-i = '<?= ($offset + $i -1 ); ?>'   
                                 data-id='<?= $row['id'];  ?>'
                                 >Delete</a>
                             <a  class="editButton btn btn-warning" 
-                                data-i = '<?= $i-1 ?>' 
+                                data-i = '<?=($offset + $i -1 ); ?>' 
                                 data-id='<?= $row['id'];  ?>'
                             >Edit</a>
+                           
                         </td>
                     </tr>
                     <?php endforeach;
@@ -45,7 +46,7 @@
            
         </table>
         <ul class="pagination ">
-            <li><a href="?pageno=1">First</a></li>
+          
            
             <?php
                 for ($i = 1; $i <= $totalPages; $i ++) {
@@ -62,7 +63,93 @@
             } // endFor
 
             ?>
-            <li><a href="?pageno=<?php echo $totalPages; ?>" onclick="showRecords('<?php echo $noOfRecordsPerPage;  ?>', '<?php echo $totalPages; ?>');">Last</a></li>
+          
             Page <?php echo $pageno; ?>
             of <?php echo $totalPages; ?>
         </ul>
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+   
+<script type="text/javascript">
+
+
+    $(document).ready(function(
+      e){
+     
+
+// Delete 
+$('.deleteButton').click(function(e){
+  var el = this;
+  // Delete id
+  var deleteid = $(this).data('id');
+  var serialid = $(this).data('i');
+  console.log(serialid)
+  var confirmalert = confirm("Are you sure?");
+  if (confirmalert == true) {
+     $.ajax({
+       url: 'delete.php',
+       type: 'POST',
+       data: { id:deleteid, i:serialid },
+       success: function(response){
+        console.log(response)
+        if(response !== ""){
+          $('.statusMsg').html('<p class="alert alert-success">Member '+serialid+' Deleted Successfully</p>');
+       // Remove row from HTML Table
+       $(el).closest('tr').css('background','tomato');
+       $(el).closest('tr').fadeOut(300,function(){
+          $(this).remove();
+       });
+       $('.statusMsg').fadeOut(3000);
+         }else{
+       alert('Invalid ID.');
+         }
+
+       }
+     });
+  }
+
+});
+
+//Edit
+$('.editButton').click(function(){
+  var el = this;
+ // Edit id
+ var editid = $(this).data('id');
+  var serialid = $(this).data('i');
+//   console.log(editid);
+//   console.log(serialid);
+
+     $.ajax({
+       url: "edit.php?id="+editid+"&&?i="+serialid,
+       success: function(response){
+        console.log(response)
+        $('.mainbody').hide();
+        $('.heading').hide();
+        history.pushState({},'',"edit.php?id="+editid);
+        $('#results').html(response);
+        console.log(serialid)
+       }
+     });   
+});
+
+//Add
+$('.addButton').click(function(){
+
+     // AJAX Request
+     $.ajax({
+       url: 'add.php',
+       success: function(response){
+        $('.mainbody').hide();
+        $('.heading').hide();
+        history.pushState({},'',"add.php");
+        $('#results').html(response);
+        
+       }
+     });
+
+     
+});
+
+});
+
+
+</script>

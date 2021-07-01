@@ -8,7 +8,7 @@
     src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 
 <title>CRUD APP</title>
-<link rel="stylesheet" href="style.css" type="text/css" />
+
 </head>
 <body>
     <div id="container">
@@ -36,9 +36,11 @@
             }
         });
     }
+
     
     $(document).ready(function() {
-        showRecords(1, 1);
+
+        showRecords(1,1);
         $.ajax({
             url:"adminpage.php",
             success:function(html){
@@ -48,6 +50,7 @@
         })
         
     });
+    
 </script>
 </html>
 

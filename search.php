@@ -12,16 +12,12 @@ $getData = new O\GetData();
 $search_data = new O\SearchData();
 
 $userData = $getData->getAllMembers($conn);
-if($userData){
-$totalRows = count($userData);
-$totalPages = ceil($totalRows / $noOfRecordsPerPage);
-}
 
-if(isset($_POST['search_data'])){
+if(isset($_POST['filtervalue'])){
 
     // $paginationData = $getData->getAllData($conn,$offset,$noOfRecordsPerPage);
     $search_data->string = $_POST['search'];
-    switch ($_POST['field_name']) {
+    switch ($_POST['filtervalue']) {
         case 'Name':
             $search_data->field_name = "name";
             break;
@@ -46,9 +42,14 @@ if(isset($_POST['search_data'])){
     }
 }
 $paginationData = $search_data->search($conn,$offset, $noOfRecordsPerPage);
-
+if($paginationData){
+    $totalRows = count($paginationData);
+    $totalPages = ceil($totalRows / $noOfRecordsPerPage);
+    }
+    
 
 ?>
+<div id="results"></div>
 <div class="mainbody">
 <?php
         require_once "components/performsection.php";

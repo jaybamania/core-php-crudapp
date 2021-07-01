@@ -209,7 +209,7 @@ class EditData
         $runn = mysqli_query($conn, $update_query);
         
         if ($runn) {
-            $this->updated = "Member {$this->serial_id} {$this->name} has been Updated Successfully";
+            $this->updated = "Member  {$this->name} has been Updated Successfully";
             return $this->updated;
         }
         // for($i = 0; $i<count($db_hobbies_id);$i++){

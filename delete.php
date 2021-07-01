@@ -8,8 +8,7 @@ if(isset($_POST['id']) && isset($_POST['i'])){
     $user_delete->id = $_POST['id'];
     $user_delete->serial_id = $_POST['i'];
     $deleted = $user_delete->delete($conn);
-    session_start();
-    $_SESSION['success'] = $deleted;
+    
     header('Location: index.php');
 }
 

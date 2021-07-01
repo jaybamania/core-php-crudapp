@@ -11,31 +11,35 @@ if (isset($_GET['id'])) {
     $getData->id = $_GET['id'];
     $userData = $getData->getUserData($conn);
 }
-if(isset($_POST['id']) || isset($_POST['name']) || isset($_POST['email']) || isset($_POST['phone']) || isset($_POST['address']) || isset($_POST['education']) || isset($_POST['hobbies']) || isset($_FILES['file']['name'][0])){
+if(isset($_POST['id']) || isset($_POST['name']) || isset($_POST['email']) || isset($_POST['phone']) || isset($_POST['address']) || isset($_POST['education']) || isset($_POST['hobbies']) || isset($_FILES['file']['name'])){
     $validation = new O\Validations();
     $validation->name = $_POST['name'];
     $validation->email = $_POST['email'];
     $validation->phone = $_POST['phone'];
     $validation->address = $_POST['address'];
+    $validation->image = $_FILES['file']['name'][0];
+    
     if(isset($_POST['education'])){$validation->education = implode(',', $_POST['education']); }
     if(isset($_POST['hobbies'])){$validation->hobbies = implode(',', $_POST['hobbies']);}
     //Updating a image
 	
     //Variables for Error Messages
     $duplicate = $nameErr = $emailErr = $phoneErr = $addressErr = $hobbiesErr = $educationErr = ""; 
-    $updated = "";
+    $updated = $update = "";
     $nameErr = $validation->validate_name();
     $emailErr = $validation->validate_email();
     $phoneErr = $validation->validate_phone();
     $addressErr = $validation->validate_address();
     $educationErr = $validation->validate_education();
     $hobbiesErr = $validation->validate_hobbies();
-    if (!$nameErr && !$emailErr && !$phoneErr && !$addressErr && !$hobbiesErr && !$educationErr) {
+    $imageErr = $validation->validate_image();
+    if (!$nameErr && !$emailErr && !$phoneErr && !$addressErr && !$hobbiesErr && !$educationErr && !$imageErr) {
         $updated_user = new O\EditData();
-        if(isset($_FILES['file']['name'][0])){
+        
+        if($_FILES['file']['size'] > 0 ){
             $output_dir = "uploads/";/* Path for file upload */
             $RandomNum   = time();
-            $ImageName      = str_replace(' ','-',strtolower($_FILES['file']['name'][0]));
+            $ImageName      = str_replace(' ','-',strtolower($_FILES['file']['name']));
             $ImageType      = $_FILES['file']['type'][0];
         
             $ImageExt = substr($ImageName, strrpos($ImageName, '.'));
@@ -73,12 +77,12 @@ if(isset($_POST['id']) || isset($_POST['name']) || isset($_POST['email']) || iss
             if (!$updated) {
                 echo "Error:" . mysqli_error($conn);
             } else {
-                
-                // echo '<script language="javascript">
-                // $(".statusMsg").html("<p class=\"alert alert-success\">"'.$updated.'</p>")
-                // $(".statusMsg").fadeOut(5000)
-                // </script>';
+                $update = "Member ".$updated_user->name." Updated Successfully";
+                echo '<script type="text/javascript">';
+                echo ' alert('.$update.')';  //not showing an alert box.
+                echo '</script>'; 
                 header('Location: edit.php?id='.$updated_user->id);
+                
             }
         }else{
             $duplicate="Email Already Exists, try something new";
@@ -90,8 +94,8 @@ if(isset($_POST['id']) || isset($_POST['name']) || isset($_POST['email']) || iss
 
 <div class="result"></div>
 <div class="mainbody">
-<h4 style="color:green; font-size:2vw;"><?php if (isset($updated)) {
-    echo $updated;
+<h4 style="color:green; font-size:2vw;"><?php if (isset($update)) {
+    echo $update;
 } ?></h4>
 <h4 style="color:red; font-size:2vw;"><?php if (isset($duplicate)) {
     echo $duplicate;
@@ -122,7 +126,7 @@ $('.mainpage').click(function(e){
         
         <label>Profile : </label>
         <img class="profileImg" id="previewImg" src="uploads/<?php echo $userData['image'] ?>" width="100px" height="100px" />
-        <input type="file" name="file[]" id="file" onChange="previewFile(this)" /><?php echo "size (<2 Mb)" ; ?>
+        <input type="file" name="file[]" id="file" onchange="previewFile(this)" /><?php echo "size (<2 Mb)" ; ?>
         <br />
         <span style="color:red"><?php if (isset($nameErr)) {
             echo $nameErr;
@@ -130,7 +134,7 @@ $('.mainpage').click(function(e){
        
     </div>
     <div class="singleform">
-        
+    <?php if(isset($validation->image)){echo $validation->image;} ?>
         <label>Name : </label>
         
         <input type="text" name="name" id="name" value="<?php echo $userData['name']; ?>">
@@ -239,6 +243,9 @@ $('.mainpage').click(function(e){
             }
             reader.readAsDataURL(file);
         }
+        else{
+            $("#file").val('');
+        }
     }
 
     $(".addForm").submit(function(e){
@@ -262,8 +269,7 @@ $('.mainpage').click(function(e){
                 $('.heading').hide();
                 history.pushState({},'',"edit.php?id="+editid);
                 $('.result').html(data);
-                console.log(data)
-                $('.fupForm').css("opacity","");
+                $('.addForm').css("opacity","");
                 $(".submitBtn").removeAttr("disabled");
                 
             }
