@@ -17,8 +17,8 @@ require "include/connect.php";
     //Image Name
     $output_dir = "uploads/";/* Path for file upload */
 	$RandomNum   = time();
-	$ImageName      = str_replace(' ','-',strtolower($_FILES['file']['name']));
-	$ImageType      = $_FILES['file']['type'];
+	$ImageName      = str_replace(' ','-',strtolower($_FILES['file']['name'][0]));
+	$ImageType      = $_FILES['file']['type'][0];
  
 	$ImageExt = substr($ImageName, strrpos($ImageName, '.'));
 	$ImageExt       = str_replace('.','',$ImageExt);
@@ -31,7 +31,7 @@ require "include/connect.php";
 	{
 		mkdir($output_dir, 0777);
 	}               
-	move_uploaded_file($_FILES["file"]["tmp_name"],$output_dir."/".$NewImageName );
+	move_uploaded_file($_FILES["file"]["tmp_name"][0],$output_dir."/".$NewImageName );
     $user->image = $NewImageName;
     // $_POST['education'])){$user->education = implode(',', $_POST['education']);
     $validation = new O\Validations();

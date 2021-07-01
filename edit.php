@@ -11,7 +11,7 @@ if (isset($_GET['id'])) {
     $getData->id = $_GET['id'];
     $userData = $getData->getUserData($conn);
 }
-if (isset($_POST['updatedata'])) {
+if(isset($_POST['id']) || isset($_POST['name']) || isset($_POST['email']) || isset($_POST['phone']) || isset($_POST['address']) || isset($_POST['education']) || isset($_POST['hobbies']) || isset($_FILES['file']['name'][0])){
     $validation = new O\Validations();
     $validation->name = $_POST['name'];
     $validation->email = $_POST['email'];
@@ -32,11 +32,12 @@ if (isset($_POST['updatedata'])) {
     $hobbiesErr = $validation->validate_hobbies();
     if (!$nameErr && !$emailErr && !$phoneErr && !$addressErr && !$hobbiesErr && !$educationErr) {
         $updated_user = new O\EditData();
-        if($_FILES['image']['name'][0]){
+        if(isset($_FILES['file']['name'][0])){
             $output_dir = "uploads/";/* Path for file upload */
             $RandomNum   = time();
-            $ImageName      = str_replace(' ','-',strtolower($_FILES['image']['name'][0]));
-            $ImageType      = $_FILES['image']['type'][0];
+            $ImageName      = str_replace(' ','-',strtolower($_FILES['file']['name'][0]));
+            $ImageType      = $_FILES['file']['type'][0];
+        
             $ImageExt = substr($ImageName, strrpos($ImageName, '.'));
             $ImageExt       = str_replace('.','',$ImageExt);
             $ImageName      = preg_replace("/\.[^.\s]{3,4}$/", "", $ImageName);
@@ -46,15 +47,15 @@ if (isset($_POST['updatedata'])) {
             /* Try to create the directory if it does not exist */
             if (!file_exists($output_dir))
             {
-                @mkdir($output_dir, 0777);
+                mkdir($output_dir, 0777);
             }               
-            move_uploaded_file($_FILES["image"]["tmp_name"][0],$output_dir."/".$NewImageName );
+            move_uploaded_file($_FILES["file"]["tmp_name"][0],$output_dir."/".$NewImageName );
             $updated_user->image = $NewImageName;
         }else{
             $updated_user->image = $userData['image'];
         }
-        $updated_user->serial_id = $_GET['i'];
-        $updated_user->id = $_POST['id'];
+        // $updated_user->serial_id = $_POST['i'];
+        $updated_user->id = $_GET['id'];
         $updated_user->name = $_POST['name'];
         $updated_user->email = $_POST['email'];
         $updated_user->phone = $_POST['phone'];
@@ -72,9 +73,12 @@ if (isset($_POST['updatedata'])) {
             if (!$updated) {
                 echo "Error:" . mysqli_error($conn);
             } else {
-                session_start();
-                $_SESSION['success'] = $updated;
-                header('Location: index.php');
+                
+                // echo '<script language="javascript">
+                // $(".statusMsg").html("<p class=\"alert alert-success\">"'.$updated.'</p>")
+                // $(".statusMsg").fadeOut(5000)
+                // </script>';
+                header('Location: edit.php?id='.$updated_user->id);
             }
         }else{
             $duplicate="Email Already Exists, try something new";
@@ -84,12 +88,16 @@ if (isset($_POST['updatedata'])) {
 ?>
 <body>
 
-
+<div class="result"></div>
 <div class="mainbody">
-
+<h4 style="color:green; font-size:2vw;"><?php if (isset($updated)) {
+    echo $updated;
+} ?></h4>
 <h4 style="color:red; font-size:2vw;"><?php if (isset($duplicate)) {
     echo $duplicate;
 } ?></h4>
+
+<div class="statusMsg"></div>
 <button class="btn btn-info mainpage m-2">Go to Mainpage</button>
 <script>
 $('.mainpage').click(function(e){
@@ -114,7 +122,7 @@ $('.mainpage').click(function(e){
         
         <label>Profile : </label>
         <img class="profileImg" id="previewImg" src="uploads/<?php echo $userData['image'] ?>" width="100px" height="100px" />
-        <input type="file" name="image[]" onChange="previewFile(this)"/>
+        <input type="file" name="file[]" id="file" onChange="previewFile(this)" /><?php echo "size (<2 Mb)" ; ?>
         <br />
         <span style="color:red"><?php if (isset($nameErr)) {
             echo $nameErr;
@@ -217,13 +225,51 @@ $('.mainpage').click(function(e){
     function previewFile(input){
         var file=$("input[type=file]").get(0).files[0];
         if(file){
+            var fileType = file.type;
+            var match = ['image/jpeg', 'image/png', 'image/jpg'];
+            if(!((fileType == match[0]) || (fileType == match[1]) || (fileType == match[2]))){
+                alert('Sorry, only JPG, JPEG, & PNG files are allowed to upload.');
+                $("#file").val('');
+                return false;
+            }
             var reader = new FileReader();
             reader.onload = function(){
                 $('#previewImg').attr("src", reader.result);
+                $('#profile').attr("value", reader.result);
             }
             reader.readAsDataURL(file);
         }
     }
+
+    $(".addForm").submit(function(e){
+        e.preventDefault();
+        var editid = $('#id').val()
+        $.ajax({
+            type: "POST",
+            url: "edit.php?id="+editid,
+            data: new FormData(this),
+            dataType: 'html',
+            contentType: false,
+            cache: false,
+            processData:false,
+            beforeSend: function(){
+                $('.submitBtn').attr("disabled","disabled");
+                $('.addForm').css("opacity",".5");
+            },
+            success: function(data)
+            {   
+                $('.mainbody').hide();
+                $('.heading').hide();
+                history.pushState({},'',"edit.php?id="+editid);
+                $('.result').html(data);
+                console.log(data)
+                $('.fupForm').css("opacity","");
+                $(".submitBtn").removeAttr("disabled");
+                
+            }
+        });
+        
+    });
 </script>
 </body>
 </html>
