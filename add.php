@@ -3,6 +3,9 @@ $my_header = 'Add Form';
 include "include/header.php";
 include "classes/operations.php";
 use Ops as O;
+interface tter extends Tsdfs{
+    function object();
+}
 $user = new O\Add();
 require "include/connect.php";
 // if(isset($_POST['ajax'])){
